@@ -1,0 +1,29 @@
+<!-- 04e11 -->
+<svg width="436px" height="109px" viewBox="0 0 436px 109px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" version="1.1"  baseProfile="full">
+<line x1="1" y1="1" x2="435" y2="1" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="1" x2="1" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="108" x2="435" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="435" y1="1" x2="435" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="109" y1="1" x2="109" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="218" y1="1" x2="218" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="327" y1="1" x2="327" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="54" x2="435" y2="54" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="55" y1="1" x2="55" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="164" y1="1" x2="164" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="273" y1="1" x2="273" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="382" y1="1" x2="382" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<path d="M27.0,25c2.93,1.07,6.45,0.65,9.51,0.38c12.46-1.08,27.45-2.96,37.91-3.64c3.32-0.22,4.63,2.42,4.04,5.13C76.0,38.12 70.75,68.5 67.76,85.62" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="27.0" cy="25.0" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+<path d="M136.0,25c2.93,1.07,6.45,0.65,9.51,0.38c12.46-1.08,27.45-2.96,37.91-3.64c3.32-0.22,4.63,2.42,4.04,5.13C185.0,38.12 179.75,68.5 176.76,85.62" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M159.0,27.75c0.75,1.25,0.67,2.48,0.5,3.5c-1.88,11-9.5,40.88-14,55.5" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="159.0" cy="27.75" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+<path d="M245.0,25c2.93,1.07,6.45,0.65,9.51,0.38c12.46-1.08,27.45-2.96,37.91-3.64c3.32-0.22,4.63,2.42,4.04,5.13C294.0,38.12 288.75,68.5 285.76,85.62" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M268.0,27.75c0.75,1.25,0.67,2.48,0.5,3.5c-1.88,11-9.5,40.88-14,55.5" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M235.0,54.45c2.88,1.03,6.17,0.51,9.13,0.28c16.46-1.29,38.81-2.53,55.99-2.89c3.23-0.07,6.44,0.02,9.62,0.71" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="235.0" cy="54.45" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+<path d="M354.0,25c2.93,1.07,6.45,0.65,9.51,0.38c12.46-1.08,27.45-2.96,37.91-3.64c3.32-0.22,4.63,2.42,4.04,5.13C403.0,38.12 397.75,68.5 394.76,85.62" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M377.0,27.75c0.75,1.25,0.67,2.48,0.5,3.5c-1.88,11-9.5,40.88-14,55.5" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M344.0,54.45c2.88,1.03,6.17,0.51,9.13,0.28c16.46-1.29,38.81-2.53,55.99-2.89c3.23-0.07,6.44,0.02,9.62,0.71" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M339.5,88.07c3.88,1.05,7.78,1.05,11.51,0.68c19.06-1.89,41.55-2.61,60.49-2.86c3.62-0.05,6.95,0.27,10.5,1.03" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="339.5" cy="88.07" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+</svg>

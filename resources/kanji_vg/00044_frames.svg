@@ -1,0 +1,16 @@
+<!-- 00044 -->
+<svg width="218px" height="109px" viewBox="0 0 218px 109px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" version="1.1"  baseProfile="full">
+<line x1="1" y1="1" x2="217" y2="1" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="1" x2="1" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="108" x2="217" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="217" y1="1" x2="217" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="109" y1="1" x2="109" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="54" x2="217" y2="54" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="55" y1="1" x2="55" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="164" y1="1" x2="164" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<path d="M29.0,17.32c0,9.1,0,62,0,73.27" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="29.0" cy="17.32" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+<path d="M138.0,17.32c0,9.1,0,62,0,73.27" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M138.43,16.8c2.31,0,1.44,0,22.4,0c20.96,0,32.23,16.18,32.23,34.97c0,18.79-10.55,39.16-30.5,39.16c-19.95,0-24.21,0-24.21,0" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="138.43" cy="16.8" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+</svg>

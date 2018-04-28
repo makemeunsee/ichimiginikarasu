@@ -1,0 +1,22 @@
+<!-- 053c9 -->
+<svg width="327px" height="109px" viewBox="0 0 327px 109px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" version="1.1"  baseProfile="full">
+<line x1="1" y1="1" x2="326" y2="1" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="1" x2="1" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="108" x2="326" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="326" y1="1" x2="326" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="109" y1="1" x2="109" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="218" y1="1" x2="218" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="54" x2="326" y2="54" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="55" y1="1" x2="55" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="164" y1="1" x2="164" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="273" y1="1" x2="273" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<path d="M29.51,26.45c3.59,0.84,6.36,0.52,9.99-0.23c8.9-1.84,29.52-6.62,31.9-7.22c3-0.76,5.37,1.35,3.85,5.28C63.17,55.48 41.86,78.74 18.75,90.5" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="29.51" cy="26.45" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+<path d="M138.51,26.45c3.59,0.84,6.36,0.52,9.99-0.23c8.9-1.84,29.52-6.62,31.9-7.22c3-0.76,5.37,1.35,3.85,5.28C172.17000000000002,55.48 150.86,78.74 127.75,90.5" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M154.52,33.83c3.73,1.92,8.48,6.79,9.54,10.13" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="154.52" cy="33.83" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+<path d="M247.51,26.45c3.59,0.84,6.36,0.52,9.99-0.23c8.9-1.84,29.52-6.62,31.9-7.22c3-0.76,5.37,1.35,3.85,5.28C281.17,55.48 259.86,78.74 236.75,90.5" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M263.52,33.83c3.73,1.92,8.48,6.79,9.54,10.13" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M244.75,37.5c5.62,1.1,28.75,26.42,49.96,42.56C300.67,84.67 307.1,88.49 314.0,91.5" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="244.75" cy="37.5" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+</svg>

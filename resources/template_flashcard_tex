@@ -1,0 +1,30 @@
+\begin{flashcard}{
+
+% \fcolorbox{red}{yellow}{
+\parbox{0.975\cardwidth}{
+  \parbox{0.35\cardwidth}{
+    \centering
+    \fontsize{70}{80}\selectfont ___KANJI___ \\[5pt]
+    \fontsize{12}{14}\selectfont ___STROKES___; ___RADICAL___ \fontsize{10}{12}\selectfont (___RADICAL_MEANING___)
+  } \\
+  \vfill
+  %drawing diagram, depends on stroke count
+___KAKIKATA___
+}
+
+%front end
+}
+\vspace{5pt}
+\centering
+\parbox{0.95\cardwidth}{
+  \setstretch{0.8}
+  \raggedright
+  \fontsize{10}{10}\selectfont
+  ___ON_READINGS___ \\[4pt]
+  ___KUN_READINGS___ \\[2pt]
+  \fontsize{10}{12}\selectfont ___MEANINGS___ \\
+  \noindent\rule[5pt]{0.95\cardwidth}{0.5pt}
+}
+
+\end{flashcard}
+

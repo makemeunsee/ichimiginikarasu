@@ -1,0 +1,22 @@
+<!-- 05c0f -->
+<svg width="327px" height="109px" viewBox="0 0 327px 109px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" version="1.1"  baseProfile="full">
+<line x1="1" y1="1" x2="326" y2="1" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="1" x2="1" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="108" x2="326" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="326" y1="1" x2="326" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="109" y1="1" x2="109" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="218" y1="1" x2="218" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="54" x2="326" y2="54" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="55" y1="1" x2="55" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="164" y1="1" x2="164" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="273" y1="1" x2="273" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<path d="M54.71,18.37c1.4,1.4,2.26,3.13,2.26,5.77c0,14.56-0.26,54.91-0.26,59.87c0,11.25-7.21,1.5-8.71,0.25" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="54.71" cy="18.37" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+<path d="M163.71,18.37c1.4,1.4,2.26,3.13,2.26,5.77c0,14.56-0.26,54.91-0.26,59.87c0,11.25-7.21,1.5-8.71,0.25" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M140.95,47.68c0.17,0.82,0.1,1.72-0.34,2.9C138.5,56.38 133.38,66.25 125.75,73" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="140.95" cy="47.68" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+<path d="M272.71000000000004,18.37c1.4,1.4,2.26,3.13,2.26,5.77c0,14.56-0.26,54.91-0.26,59.87c0,11.25-7.21,1.5-8.71,0.25" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M249.95,47.68c0.17,0.82,0.1,1.72-0.34,2.9C247.5,56.38 242.38,66.25 234.75,73" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M298.96,47.12C304.62,52 313.25,64.62 315.0,72" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="298.96" cy="47.12" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+</svg>
