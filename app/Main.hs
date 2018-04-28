@@ -18,7 +18,7 @@ import System.Process (system)
 data Radical = Radical { r_number :: Int, r_char :: Char, r_strokes :: Int, r_meaning :: String }
   deriving ( Show, Eq )
 
-data Kanji = Kanji { char :: Char, codepoint :: String, radical :: Radical, strokes :: Int, onReadings :: [String], kunReadings :: [String], meanings :: [String] }
+data Kanji = Kanji { char :: Char, codepoint :: String, radical :: Radical, strokes :: Int, onReadings :: [String], kunReadings :: [String], meanings :: [String], similars :: String }
   deriving ( Show, Eq )
 
 isCJK c = ord c >= 19968 && ord c <= 40879
@@ -39,6 +39,7 @@ substitutions =
   , ("___KUN_READINGS___", printReadings . kunReadings)
   , ("___MEANINGS___", printReadings . meanings)
   , ("___1ST_BOX_HEIGHT___", firstBoxHeight)
+  , ("___SIMILAR_KANJIS___", similarSubst . similars)
   ]
 
 applySubstitution :: Kanji -> String -> (String, Kanji -> String) -> String
@@ -92,8 +93,8 @@ placeHolderRadical number = Radical { r_number = number, r_char = '?', r_strokes
 langFilter "en" = noAttrFilter "m_lang"
 langFilter str = attrFilter "m_lang" str
 
-loadKanji :: String ->  Element -> Kanji
-loadKanji lang kanjiEntry = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings }
+loadKanji :: String -> Element -> Kanji
+loadKanji lang kanjiEntry = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = "???" }
   where
     isUCS = attrFilter "cp_type" "ucs"
     cpValues = findDeepElements ["codepoint", "cp_value"] kanjiEntry
@@ -140,6 +141,23 @@ pdfGen kanji = do
     stks = strokes kanji
     cp = codepoint kanji
 
+similarSubst sims = "    \\begin{TAB}(e,1cm,1cm){|c|}{|" ++ pattern ++ "|}\n" ++ boxes ++ "    \\end{TAB}%"
+  where
+    l = length sims
+    pattern = intersperse '|' $ fmap (const 'c') [0..l-1]
+    boxes = concatMap toBox sims
+    toBox k = "      \\parbox[c][1cm][c]{1cm}{%\n \
+\        \\centering\n \
+\        \\fontsize{22}{23}\\selectfont " ++ (k : "") ++ " \\\\\n \
+\        \\fontsize{5}{5}\\selectfont ???\n \
+\      } \\\\\n"
+    
+
+loadSimilars similars kanji = kanji { similars = sims }
+  where
+    sims = maybe "¤" tail $ listToMaybe $ filter ((== kanjiChar) . head) similars
+    kanjiChar = char kanji
+
 main :: IO ()
 main = do
   template <- readFile "resources/template_tex"
@@ -150,12 +168,15 @@ main = do
   radicals <- fmap (fmap lineToRadical . lines) $ readFile "resources/radicals_haskelled"
 
   krad <- fmap (fmap lineToParts . filter notComment . lines) $ readFile "resources/kradfile-u_haskelled"
+  
+  similars <- fmap (fmap (take 4) . fmap (filter isCJK) . lines) $ readFile "resources/jyouyou__strokeEditDistance.csv"
  
   lang <- fmap head getArgs 
   codepoints <- fmap (filter isCJK) $ fmap (head . tail) getArgs >>= readFile
 
   let chars = concatMap (findElements $ simpleName "character") kanjidic
-  let kanjis = fmap (loadRadicalData radicals krad . (loadKanji lang)) chars
+  let kanjis = fmap (loadSimilars similars . loadRadicalData radicals krad . loadKanji lang) chars
+-- fmap (loadRadicalData radicals krad . (loadKanji lang)) chars
   let relevants = filter (\k -> elem (char k) codepoints) kanjis
 --  print relevants
 

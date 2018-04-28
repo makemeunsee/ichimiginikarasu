@@ -18,30 +18,13 @@ ___KAKIKATA1___
       \item XXX
       %up to 6 compounds like '      \item ...'
 %___COMPOUNDS___
-    \end{enumerate}
+    \end{enumerate}%
   }%
   }%
   \fcolorbox{red}{yellow}{%
   \parbox[t][0.75\cardheight][c]{0.18\cardwidth}{%
     \centering
-% ___SIMILAR_KANJIS___
-    \begin{TAB}(e,1cm,1cm){|c|}{|c|c|c|}
-      \parbox[c][1cm][c]{1cm}{%
-        \centering
-        \fontsize{22}{23}\selectfont 字 \\
-        \fontsize{5}{5}\selectfont character
-      } \\
-      \parbox[c][1cm][c]{1cm}{%
-        \centering
-        \fontsize{22}{23}\selectfont 子 \\
-        \fontsize{5}{5}\selectfont child
-      } \\
-      \parbox[c][1cm][c]{1cm}{%
-        \centering
-        \fontsize{22}{23}\selectfont ? \\
-        \fontsize{5}{5}\selectfont ???
-      } 
-    \end{TAB}%
+___SIMILAR_KANJIS___
   }%
   } \\%
 %drawing diagram, if  stroke count < 12
@@ -54,15 +37,16 @@ ___KAKIKATA2___
 }
 \vspace{5pt}
 \centering
-\parbox{0.95\cardwidth}{
+\fcolorbox{red}{yellow}{%
+\parbox{0.95\cardwidth}{%
   \setstretch{0.8}
   \raggedright
   \fontsize{10}{10}\selectfont
   ___ON_READINGS___ \\[4pt]
   ___KUN_READINGS___ \\[2pt]
   \fontsize{10}{12}\selectfont ___MEANINGS___ \\
-  \noindent\rule[5pt]{0.95\cardwidth}{0.5pt}
-}
-
+  \noindent\rule[5pt]{0.95\cardwidth}{0.5pt}%
+}%
+}%
 \end{flashcard}
 
