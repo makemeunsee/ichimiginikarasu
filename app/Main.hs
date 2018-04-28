@@ -38,27 +38,39 @@ substitutions =
   , ("___ON_READINGS___",  printReadings . onReadings)
   , ("___KUN_READINGS___", printReadings . kunReadings)
   , ("___MEANINGS___", printReadings . meanings)
+  , ("___1ST_BOX_HEIGHT___", firstBoxHeight)
   ]
 
 applySubstitution :: Kanji -> String -> (String, Kanji -> String) -> String
 applySubstitution kanji string (toReplace, extractor) = replace toReplace (extractor kanji) string
 
 insertKanji :: String -> Kanji -> String -> String
-insertKanji flashcardTemplate kanji pdfTexFilename = foldl (applySubstitution kanji) flashcardTemplate $ ("___KAKIKATA___", kakikata pdfTexFilename) : substitutions 
+insertKanji flashcardTemplate kanji pdfTexFilename = foldl (applySubstitution kanji) flashcardTemplate $ ("___KAKIKATA1___", kakikata1 pdfTexFilename) : ("___KAKIKATA2___", kakikata2 pdfTexFilename) : substitutions 
 
 insertFlashcards string cards = replace "___FLASHCARDS___" cards string
 
-kakikata pdfTexFilename kanji
-  | stks > 12 = "  \\hspace{5pt}%\n \
-\  \\parbox[0.25\\cardheight]{0.2\\cardwidth}{\n \
-\    \\def\\svgwidth{0.2\\cardwidth}\n \
-\    \\fontsize{7}{7}\\selectfont\n \
-\    \\input{" ++ pdfTexFilename ++ ".pdf_tex}\n \
-\  }"
-  | otherwise = "  \\parbox{0.975\\cardwidth}{\n \
+firstBoxHeight kanji
+  | stks > 12 = ""
+  | otherwise = "0.75"
+  where
+    stks = strokes kanji
+
+kakikata1 pdfTexFilename kanji
+  | stks > 12 = "    \\def\\svgwidth{0.18\\cardwidth}\n \
+\    \\fontsize{6}{6}\\selectfont\n \
+\    \\input{" ++ pdfTexFilename ++ ".pdf_tex}"
+  | otherwise = ""
+  where
+    stks = strokes kanji
+
+kakikata2 pdfTexFilename kanji
+  | stks > 12 = ""
+  | otherwise = "  \\fcolorbox{red}{yellow}{%\n \
+\  \\parbox[c][0.22\\cardheight][c]{\\cardwidth}{%\n \
 \    \\def\\svgwidth{" ++ svgWidth ++ "\\cardwidth}\n \
 \    \\input{" ++ pdfTexFilename ++ ".pdf_tex}\n \
-\  }"
+\  }%\n \
+\  }%"
   where
     stks = strokes kanji
     svgWidth = show $ min 0.975 $ fromIntegral stks * 0.135

@@ -19,6 +19,8 @@
 \newlength{\customthickness}
 \setlength{\customthickness}{0.2pt}
 
+\setlength{\fboxsep}{0pt}
+
 \makeatletter
 \let\@tab@size@rule\customthickness
 \makeatother
