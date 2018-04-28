@@ -42,8 +42,8 @@ ___KAKIKATA2___
   \setstretch{0.8}
   \raggedright
   \fontsize{10}{10}\selectfont
-  ___ON_READINGS___ \\[4pt]
-  ___KUN_READINGS___ \\[2pt]
+  ___ON_READINGS___
+  ___KUN_READINGS___
   \fontsize{10}{12}\selectfont ___MEANINGS___ \\
   \noindent\rule[5pt]{0.95\cardwidth}{0.5pt}%
 }%

@@ -29,14 +29,17 @@ printReadings = concat . intersperse ", " . fmap (\s -> "\\mbox{" ++ s ++ "}")
 -- where
 --   truncReadings = mkUniq $ fmap (takeWhile (/= '.')) readings
 
+suffixIfNotEmpty _ "" = ""
+suffixIfNotEmpty suff str = str ++ suff
+
 substitutions :: [(String, Kanji -> String)]
 substitutions =
   [ ("___KANJI___", (: []) . char)
   , ("___STROKES___", show . strokes)
   , ("___RADICAL___", (: []) . r_char . radical)
   , ("___RADICAL_MEANING___", r_meaning . radical)
-  , ("___ON_READINGS___",  printReadings . onReadings)
-  , ("___KUN_READINGS___", printReadings . kunReadings)
+  , ("___ON_READINGS___",  suffixIfNotEmpty " \\\\[4pt]" . printReadings . onReadings)
+  , ("___KUN_READINGS___", suffixIfNotEmpty " \\\\[2pt]" . printReadings . kunReadings)
   , ("___MEANINGS___", printReadings . meanings)
   , ("___1ST_BOX_HEIGHT___", firstBoxHeight)
   , ("___SIMILAR_KANJIS___", similarSubst . similars)
@@ -93,20 +96,35 @@ placeHolderRadical number = Radical { r_number = number, r_char = '?', r_strokes
 langFilter "en" = noAttrFilter "m_lang"
 langFilter str = attrFilter "m_lang" str
 
+safeStrContent = escapeTex . strContent
+  where
+    escapeTex ('%' : t) = "\\%" ++ escapeTex t
+    escapeTex ('&' : t) = "\\&" ++ escapeTex t
+    escapeTex ('$' : t) = "\\$" ++ escapeTex t
+    escapeTex ('#' : t) = "\\#" ++ escapeTex t
+    escapeTex ('_' : t) = "\\_" ++ escapeTex t
+    escapeTex ('{' : t) = "\\{" ++ escapeTex t
+    escapeTex ('}' : t) = "\\}" ++ escapeTex t
+    escapeTex ('~' : t) = "\\textasciitilde" ++ escapeTex t
+    escapeTex ('^' : t) = "\\textasciicircum" ++ escapeTex t
+    escapeTex ('\\' : t) = "\\textbackslash" ++ escapeTex t
+    escapeTex (h : t) = h : escapeTex t
+    escapeTex [] = []
+
 loadKanji :: String -> Element -> Kanji
 loadKanji lang kanjiEntry = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = "???" }
   where
     isUCS = attrFilter "cp_type" "ucs"
     cpValues = findDeepElements ["codepoint", "cp_value"] kanjiEntry
     codepoint = strContent $ head $ filter isUCS cpValues
-    char = head $ strContent $ head $ findDeepElements ["literal"] kanjiEntry
+    char = head $ safeStrContent $ head $ findDeepElements ["literal"] kanjiEntry
     radValues = findDeepElements ["radical", "rad_value"] kanjiEntry
     isClassical = attrFilter "rad_type" "classical"
     radical = read $ strContent $ head $ filter isClassical radValues
     strokes = read $ strContent $ head $ findDeepElements ["misc", "stroke_count"] kanjiEntry
-    kunReadings = fmap strContent $ filter (attrFilter "r_type" "ja_kun") $ findDeepElements ["reading_meaning", "rmgroup", "reading"] kanjiEntry
-    onReadings = fmap strContent $ filter (attrFilter "r_type" "ja_on") $ findDeepElements ["reading_meaning", "rmgroup", "reading"] kanjiEntry
-    meanings = fmap strContent $ filter (langFilter lang) $ findDeepElements ["reading_meaning", "rmgroup", "meaning"] kanjiEntry
+    kunReadings = fmap safeStrContent $ filter (attrFilter "r_type" "ja_kun") $ findDeepElements ["reading_meaning", "rmgroup", "reading"] kanjiEntry
+    onReadings = fmap safeStrContent $ filter (attrFilter "r_type" "ja_on") $ findDeepElements ["reading_meaning", "rmgroup", "reading"] kanjiEntry
+    meanings = fmap safeStrContent $ filter (langFilter lang) $ findDeepElements ["reading_meaning", "rmgroup", "meaning"] kanjiEntry
 
 lineToRadical  = read
 
@@ -163,7 +181,7 @@ main = do
   template <- readFile "resources/template_tex"
   template_flashcard <- readFile "resources/template_flashcard_tex"
 
-  kanjidic <- fmap (onlyElems . parseXML) $ readFile "resources/kanjidic2_sample.xml"
+  kanjidic <- fmap (onlyElems . parseXML) $ readFile "resources/kanjidic2.xml"
 
   radicals <- fmap (fmap lineToRadical . lines) $ readFile "resources/radicals_haskelled"
 
