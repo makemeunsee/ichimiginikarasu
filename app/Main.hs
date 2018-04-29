@@ -172,13 +172,16 @@ similarSubst sims = "    \\begin{TAB}(e,1cm,1cm){|c|}{|" ++ pattern ++ "|}\n" ++
 \        \\fontsize{22}{23}\\selectfont " ++ (char : "") ++ " \\\\\n \
 \        \\fontsize{5}{5}\\selectfont \\hspace{0pt}" ++ meaning ++ " \n \
 \      } \\\\\n"
-    
 
 loadSimilars kanjis similars kanji = kanji { similars = sims }
   where
     sims = maybe [('¤',"???")] (tail . fmap findMeaning) $ listToMaybe $ filter ((== kanjiChar) . head) similars
     kanjiChar = char kanji
     findMeaning c = (c, maybe "???" (head . meanings) $ find (\k -> char k == c) kanjis)
+
+loadCompounds freqList jmdic kanji = kanji { compounds = compounds }
+  where
+    compounds = fmap (\compound -> (compound,"…")) $ take 6 $ filter (elem $ char kanji) freqList 
 
 data Params = Params
   { debug :: Bool
@@ -227,11 +230,15 @@ generateFlashcards (Params debug input lang) = do
   
   similars <- fmap (fmap (take 4) . fmap (filter isCJK) . lines) $ readFile "resources/jyouyou__strokeEditDistance.csv"
 
+  freqList1 <- fmap lines $ readFile "resources/jpn_words_10000"
+  freqList2 <- fmap lines $ readFile "resources/jpn_words_15000"
+
   codepoints <- fmap (mkUniq . filter isCJK) $ readFile input
 
-  let chars = concatMap (findElements $ simpleName "character") kanjidic
-  let kanjiStubs = fmap (loadRadicalData radicals krad . loadKanji lang) chars
-  let kanjis = fmap (loadSimilars kanjiStubs similars) kanjiStubs
+  let kanjisNoRad = concatMap (findElements $ simpleName "character") kanjidic
+  let kanjisNoSims = fmap (loadRadicalData radicals krad . loadKanji lang) kanjisNoRad
+  let kanjisNoCompounds = fmap (loadSimilars kanjisNoSims similars) kanjisNoSims
+  let kanjis = fmap (loadCompounds (freqList1 ++ freqList2) jmdic) kanjisNoCompounds
 
 -- fmap (loadRadicalData radicals krad . (loadKanji lang)) chars
   let relevants = filter (\k -> elem (char k) codepoints) kanjis
