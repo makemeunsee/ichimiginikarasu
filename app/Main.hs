@@ -19,7 +19,7 @@ mkUniq = toList . fromList
 data Radical = Radical { r_number :: Int, r_char :: Char, r_strokes :: Int, r_meaning :: String }
   deriving ( Show, Eq )
 
-data Kanji = Kanji { char :: Char, codepoint :: String, radical :: Radical, strokes :: Int, onReadings :: [String], kunReadings :: [String], meanings :: [String], similars :: [(Char, String)] }
+data Kanji = Kanji { char :: Char, codepoint :: String, radical :: Radical, strokes :: Int, onReadings :: [String], kunReadings :: [String], meanings :: [String], similars :: [(Char, String)], compounds :: [(String, String)] }
   deriving ( Show, Eq )
 
 isCJK c = ord c >= 19968 && ord c <= 40879
@@ -42,9 +42,13 @@ substitutions =
   , ("___ON_READINGS___",  suffixIfNotEmpty " \\\\[4pt]" . printReadings . onReadings)
   , ("___KUN_READINGS___", suffixIfNotEmpty " \\\\[2pt]" . printReadings . kunReadings)
   , ("___MEANINGS___", printReadings . meanings)
-  , ("___1ST_BOX_HEIGHT___", firstBoxHeight)
+  , ("___BOXES_HEIGHT___", boxesHeight)
   , ("___SIMILAR_KANJIS___", similarSubst . similars)
+  , ("___COMPOUNDS___", makeCompounds fst)
+  , ("___COMPOUND_TRANSLATIONS___", makeCompounds snd)
   ]
+
+makeCompounds which = concat . intersperse "\n" . fmap ("      \\item " ++) . fmap which . take 6 . compounds
 
 applySubstitution :: Kanji -> String -> (String, Kanji -> String) -> String
 applySubstitution kanji string (toReplace, extractor) = replace toReplace (extractor kanji) string
@@ -54,7 +58,7 @@ insertKanji flashcardTemplate kanji pdfTexFilename = foldl (applySubstitution ka
 
 insertFlashcards string cards = replace "___FLASHCARDS___" cards string
 
-firstBoxHeight kanji
+boxesHeight kanji
   | stks > 12 = ""
   | otherwise = "0.75"
   where
@@ -111,7 +115,7 @@ safeStrContent = escapeTex . strContent
     escapeTex [] = []
 
 loadKanji :: String -> Element -> Kanji
-loadKanji lang kanjiEntry = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = [('¤',"???")] }
+loadKanji lang kanjiEntry = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = [('¤',"???")], compounds = [("???","???")] }
   where
     isUCS = attrFilter "cp_type" "ucs"
     cpValues = findDeepElements ["codepoint", "cp_value"] kanjiEntry
@@ -215,6 +219,7 @@ generateFlashcards (Params debug input lang) = do
   template_flashcard <- readFile $ flashcardTemplate debug 
 
   kanjidic <- fmap (onlyElems . parseXML) $ readFile "resources/kanjidic2.xml"
+  jmdic <- fmap (onlyElems . parseXML) $ readFile "resources/JMdict"
 
   radicals <- fmap (fmap lineToRadical . lines) $ readFile "resources/radicals_haskelled"
 

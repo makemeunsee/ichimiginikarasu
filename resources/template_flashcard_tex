@@ -1,22 +1,21 @@
 \begin{flashcard}{
 
 \parbox{\cardwidth}{%
-  \parbox[t][___1ST_BOX_HEIGHT___\cardheight][c]{0.4\cardwidth}{%
+  \parbox[t][___BOXES_HEIGHT___\cardheight][c]{0.4\cardwidth}{%
     \centering
     \fontsize{80}{80}\selectfont ___KANJI___ \\[5pt]
     \fontsize{12}{14}\selectfont ___STROKES___; ___RADICAL___ \fontsize{10}{12}\selectfont ___RADICAL_MEANING___
 %drawing diagram, if stroke count >= 12
 ___KAKIKATA1___
   }%
-  \parbox[t][0.75\cardheight][t]{0.4\cardwidth}{%
+  \parbox[t][___BOXES_HEIGHT___\cardheight][t]{0.4\cardwidth}{%
     \fontsize{14.5}{14.5}\selectfont
     \begin{enumerate}[leftmargin=20pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\normalfont\normalsize]
-      \item XXX
       %up to 6 compounds like '      \item ...'
-%___COMPOUNDS___
+___COMPOUNDS___
     \end{enumerate}%
   }%
-  \parbox[t][0.75\cardheight][c]{0.18\cardwidth}{%
+  \parbox[t][___BOXES_HEIGHT___\cardheight][c]{0.18\cardwidth}{%
     \centering
 ___SIMILAR_KANJIS___
   } \\%
@@ -34,9 +33,14 @@ ___KAKIKATA2___
   \raggedright
   \fontsize{10}{10}\selectfont
   ___ON_READINGS___
-  ___KUN_READINGS___
   \fontsize{10}{12}\selectfont ___MEANINGS___ \\
   \noindent\rule[5pt]{0.95\cardwidth}{0.5pt}%
+  \fontsize{10}{12}\selectfont
+  \begin{enumerate}[leftmargin=13pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\normalfont\small]
+    %up to 6 compound meanings like '    \item [hiragana] [translation]'
+___COMPOUND_TRANSLATIONS___
+  \end{enumerate}
+}%
 }%
 \end{flashcard}
 

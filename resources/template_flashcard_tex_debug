@@ -43,9 +43,13 @@ ___KAKIKATA2___
   \raggedright
   \fontsize{10}{10}\selectfont
   ___ON_READINGS___
-  ___KUN_READINGS___
   \fontsize{10}{12}\selectfont ___MEANINGS___ \\
   \noindent\rule[5pt]{0.95\cardwidth}{0.5pt}%
+  \fontsize{10}{12}\selectfont
+  \begin{enumerate}[leftmargin=13pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\normalfont\small]
+    %up to 6 compound meanings like '    \item [hiragana] [translation]'
+___COMPOUND_TRANSLATIONS___
+  \end{enumerate}
 }%
 }%
 \end{flashcard}
