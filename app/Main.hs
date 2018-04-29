@@ -7,7 +7,7 @@ import Text.XML.Light.Types
 import Data.Char (ord)
 import Data.Maybe (fromJust, listToMaybe)
 import Data.String.Utils (replace)
-import Data.List (intersperse)
+import Data.List (intersperse, find)
 import System.Process (system)
 
 --import Data.Set (toList, fromList)
@@ -18,7 +18,7 @@ import System.Process (system)
 data Radical = Radical { r_number :: Int, r_char :: Char, r_strokes :: Int, r_meaning :: String }
   deriving ( Show, Eq )
 
-data Kanji = Kanji { char :: Char, codepoint :: String, radical :: Radical, strokes :: Int, onReadings :: [String], kunReadings :: [String], meanings :: [String], similars :: String }
+data Kanji = Kanji { char :: Char, codepoint :: String, radical :: Radical, strokes :: Int, onReadings :: [String], kunReadings :: [String], meanings :: [String], similars :: [(Char, String)] }
   deriving ( Show, Eq )
 
 isCJK c = ord c >= 19968 && ord c <= 40879
@@ -60,7 +60,7 @@ firstBoxHeight kanji
     stks = strokes kanji
 
 kakikata1 pdfTexFilename kanji
-  | stks > 12 = "    \\def\\svgwidth{0.18\\cardwidth}\n \
+  | stks > 12 = "    \\\\ \\def\\svgwidth{0.18\\cardwidth}\n \
 \    \\fontsize{6}{6}\\selectfont\n \
 \    \\input{" ++ pdfTexFilename ++ ".pdf_tex}"
   | otherwise = ""
@@ -112,7 +112,7 @@ safeStrContent = escapeTex . strContent
     escapeTex [] = []
 
 loadKanji :: String -> Element -> Kanji
-loadKanji lang kanjiEntry = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = "???" }
+loadKanji lang kanjiEntry = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = [('¤',"???")] }
   where
     isUCS = attrFilter "cp_type" "ucs"
     cpValues = findDeepElements ["codepoint", "cp_value"] kanjiEntry
@@ -164,17 +164,18 @@ similarSubst sims = "    \\begin{TAB}(e,1cm,1cm){|c|}{|" ++ pattern ++ "|}\n" ++
     l = length sims
     pattern = intersperse '|' $ fmap (const 'c') [0..l-1]
     boxes = concatMap toBox sims
-    toBox k = "      \\parbox[c][1cm][c]{1cm}{%\n \
+    toBox (char, meaning) = "      \\parbox[c][1cm][c]{1cm}{%\n \
 \        \\centering\n \
-\        \\fontsize{22}{23}\\selectfont " ++ (k : "") ++ " \\\\\n \
-\        \\fontsize{5}{5}\\selectfont ???\n \
+\        \\fontsize{22}{23}\\selectfont " ++ (char : "") ++ " \\\\\n \
+\        \\fontsize{5}{5}\\selectfont \\hspace{0pt}" ++ meaning ++ " \n \
 \      } \\\\\n"
     
 
-loadSimilars similars kanji = kanji { similars = sims }
+loadSimilars kanjis similars kanji = kanji { similars = sims }
   where
-    sims = maybe "¤" tail $ listToMaybe $ filter ((== kanjiChar) . head) similars
+    sims = maybe [('¤',"???")] (tail . fmap findMeaning) $ listToMaybe $ filter ((== kanjiChar) . head) similars
     kanjiChar = char kanji
+    findMeaning c = (c, maybe "???" (head . meanings) $ find (\k -> char k == c) kanjis)
 
 main :: IO ()
 main = do
@@ -193,7 +194,9 @@ main = do
   codepoints <- fmap (filter isCJK) $ fmap (head . tail) getArgs >>= readFile
 
   let chars = concatMap (findElements $ simpleName "character") kanjidic
-  let kanjis = fmap (loadSimilars similars . loadRadicalData radicals krad . loadKanji lang) chars
+  let kanjiStubs = fmap (loadRadicalData radicals krad . loadKanji lang) chars
+  let kanjis = fmap (loadSimilars kanjiStubs similars) kanjiStubs
+
 -- fmap (loadRadicalData radicals krad . (loadKanji lang)) chars
   let relevants = filter (\k -> elem (char k) codepoints) kanjis
 --  print relevants

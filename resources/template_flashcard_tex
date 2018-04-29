@@ -6,7 +6,7 @@
   \parbox[t][___1ST_BOX_HEIGHT___\cardheight][c]{0.4\cardwidth}{%
     \centering
     \fontsize{80}{80}\selectfont ___KANJI___ \\[5pt]
-    \fontsize{12}{14}\selectfont ___STROKES___; ___RADICAL___ \fontsize{10}{12}\selectfont (___RADICAL_MEANING___)
+    \fontsize{12}{14}\selectfont ___STROKES___; ___RADICAL___ \fontsize{10}{12}\selectfont ___RADICAL_MEANING___
 %drawing diagram, if stroke count >= 12
 ___KAKIKATA1___
   }%
