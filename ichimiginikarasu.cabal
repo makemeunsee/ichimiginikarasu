@@ -24,6 +24,7 @@ executable ichimiginikarasu-exe
                      , xml
                      , containers
                      , MissingH
+                     , optparse-applicative
                      , process
                      , ichimiginikarasu
   default-language:    Haskell2010

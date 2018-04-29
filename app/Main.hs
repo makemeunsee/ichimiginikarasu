@@ -9,11 +9,12 @@ import Data.Maybe (fromJust, listToMaybe)
 import Data.String.Utils (replace)
 import Data.List (intersperse, find)
 import System.Process (system)
+import Options.Applicative
+import Data.Semigroup ((<>))
+import Data.Set (toList, fromList)
 
---import Data.Set (toList, fromList)
-
---mkUniq :: Ord a => [a] -> [a]
---mkUniq = toList . fromList
+mkUniq :: Ord a => [a] -> [a]
+mkUniq = toList . fromList
 
 data Radical = Radical { r_number :: Int, r_char :: Char, r_strokes :: Int, r_meaning :: String }
   deriving ( Show, Eq )
@@ -69,11 +70,9 @@ kakikata1 pdfTexFilename kanji
 
 kakikata2 pdfTexFilename kanji
   | stks > 12 = ""
-  | otherwise = "  \\fcolorbox{red}{yellow}{%\n \
-\  \\parbox[c][0.22\\cardheight][c]{\\cardwidth}{%\n \
+  | otherwise = "  \\parbox[c][0.22\\cardheight][c]{\\cardwidth}{%\n \
 \    \\def\\svgwidth{" ++ svgWidth ++ "\\cardwidth}\n \
 \    \\input{" ++ pdfTexFilename ++ ".pdf_tex}\n \
-\  }%\n \
 \  }%"
   where
     stks = strokes kanji
@@ -152,7 +151,7 @@ vgFilename stks cp = "resources/kanji_vg/" ++ "0" ++ cp ++ qualifier
 
 pdfGen :: Kanji -> IO String
 pdfGen kanji = do
-  _ <-system $ "inkscape -D -z --file=" ++ filename ++ ".svg --export-pdf=" ++ filename ++ ".pdf --export-latex"
+  _ <- system $ "inkscape -D -z --file=" ++ filename ++ ".svg --export-pdf=" ++ filename ++ ".pdf --export-latex"
   return filename
   where
     filename = vgFilename stks cp
@@ -177,10 +176,43 @@ loadSimilars kanjis similars kanji = kanji { similars = sims }
     kanjiChar = char kanji
     findMeaning c = (c, maybe "???" (head . meanings) $ find (\k -> char k == c) kanjis)
 
+data Params = Params
+  { debug :: Bool
+  , inputFile :: String
+  , lang :: String }
+
+params :: Parser Params
+params = Params
+  <$> switch
+     ( long "debug"
+    <> short 'd'
+    <> help "draw frame boxes to help debug generated latex code" )
+  <*> strOption
+     ( long "input"
+    <> short 'i'
+    <> metavar "FILENAME"
+    <> help "text file containing the kanjis of which to create flashcards" )
+  <*> strOption
+     ( long "lang"
+    <> short 'l'
+    <> showDefault
+    <> value "en"
+    <> help "the language used in translations" )
+
 main :: IO ()
-main = do
+main = generateFlashcards =<< execParser opts
+  where
+    opts = info (params <**> helper)
+      ( fullDesc
+     <> progDesc "Generate Latex kanji flashcards for all kanjis in file FILENAME"
+     <> header "一右二烏 - a Kanji flashcards generation tool" ) 
+
+flashcardTemplate True = flashcardTemplate False ++ "_debug"
+flashcardTemplate False = "resources/template_flashcard_tex"
+
+generateFlashcards (Params debug input lang) = do
   template <- readFile "resources/template_tex"
-  template_flashcard <- readFile "resources/template_flashcard_tex"
+  template_flashcard <- readFile $ flashcardTemplate debug 
 
   kanjidic <- fmap (onlyElems . parseXML) $ readFile "resources/kanjidic2.xml"
 
@@ -189,9 +221,8 @@ main = do
   krad <- fmap (fmap lineToParts . filter notComment . lines) $ readFile "resources/kradfile-u_haskelled"
   
   similars <- fmap (fmap (take 4) . fmap (filter isCJK) . lines) $ readFile "resources/jyouyou__strokeEditDistance.csv"
- 
-  lang <- fmap head getArgs 
-  codepoints <- fmap (filter isCJK) $ fmap (head . tail) getArgs >>= readFile
+
+  codepoints <- fmap (mkUniq . filter isCJK) $ readFile input
 
   let chars = concatMap (findElements $ simpleName "character") kanjidic
   let kanjiStubs = fmap (loadRadicalData radicals krad . loadKanji lang) chars
@@ -205,7 +236,7 @@ main = do
 --  print pdfTexs
   let flashcards = concatMap (uncurry $ insertKanji template_flashcard) $ zip relevants pdfTexs
   let tex = insertFlashcards template flashcards
-  writeFile "demo.tex" tex
+  --writeFile "demo.tex" tex
 
   --mapM_ print kanjis
-  print 0
+  putStrLn tex
