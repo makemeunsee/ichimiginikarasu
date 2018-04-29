@@ -15,7 +15,6 @@ ___KAKIKATA1___
   \parbox[t][___BOXES_HEIGHT___\cardheight][t]{0.4\cardwidth}{%
     \fontsize{14.5}{14.5}\selectfont
     \begin{enumerate}[leftmargin=20pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\normalfont\normalsize]
-      \item XXX
       %up to 6 compounds like '      \item ...'
 %___COMPOUNDS___
     \end{enumerate}%
