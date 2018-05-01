@@ -24,8 +24,10 @@ data Kanji = Kanji { char :: Char, codepoint :: String, radical :: Radical, stro
 
 isCJK c = ord c >= 19968 && ord c <= 40879
 
+printMeanings :: [String] -> String
+printMeanings = concat . intersperse ", "
 printReadings :: [String] -> String
-printReadings = concat . intersperse ", " . fmap (\s -> "\\mbox{" ++ s ++ "}")
+printReadings = printMeanings . fmap (\s -> "\\mbox{" ++ s ++ "}")
 --printReadings readings = concat . intersperse ", " . fmap (\s -> "\\mbox{" ++ s ++ "}") $ truncReadings
 -- where
 --   truncReadings = mkUniq $ fmap (takeWhile (/= '.')) readings
@@ -41,14 +43,17 @@ substitutions =
   , ("___RADICAL_MEANING___", r_meaning . radical)
   , ("___ON_READINGS___",  suffixIfNotEmpty " \\\\[4pt]" . printReadings . onReadings)
   , ("___KUN_READINGS___", suffixIfNotEmpty " \\\\[2pt]" . printReadings . kunReadings)
-  , ("___MEANINGS___", printReadings . meanings)
+  , ("___MEANINGS___", printMeanings . meanings)
   , ("___BOXES_HEIGHT___", boxesHeight)
   , ("___SIMILAR_KANJIS___", similarSubst . similars)
   , ("___COMPOUNDS___", makeCompounds fst)
   , ("___COMPOUND_TRANSLATIONS___", makeCompounds snd)
   ]
 
-makeCompounds which = concat . intersperse "\n" . fmap ("      \\item " ++) . fmap which . take 6 . compounds
+makeCompounds which = concat . intersperse "\n" . fmap ("      \\item " ++) . fmap which . take 6 . withFallback . compounds
+  where
+    withFallback [] = [("¤","¤")]
+    withFallback l = l
 
 applySubstitution :: Kanji -> String -> (String, Kanji -> String) -> String
 applySubstitution kanji string (toReplace, extractor) = replace toReplace (extractor kanji) string
@@ -60,24 +65,25 @@ insertFlashcards string cards = replace "___FLASHCARDS___" cards string
 
 boxesHeight kanji
   | stks > 12 = ""
-  | otherwise = "0.75"
+  | otherwise = "0.77"
   where
     stks = strokes kanji
 
 kakikata1 pdfTexFilename kanji
-  | stks > 12 = "    \\\\ \\def\\svgwidth{0.18\\cardwidth}\n \
-\    \\fontsize{6}{6}\\selectfont\n \
-\    \\input{" ++ pdfTexFilename ++ ".pdf_tex}"
+  | stks > 12 = "    \\def\\svgwidth{0.18\\cardwidth}\n \
+\   \\fontsize{6}{6}\\selectfont\n \
+\   \\input{" ++ pdfTexFilename ++ ".pdf_tex}"
   | otherwise = ""
   where
     stks = strokes kanji
 
 kakikata2 pdfTexFilename kanji
   | stks > 12 = ""
-  | otherwise = "  \\parbox[c][0.22\\cardheight][c]{\\cardwidth}{%\n \
-\    \\def\\svgwidth{" ++ svgWidth ++ "\\cardwidth}\n \
-\    \\input{" ++ pdfTexFilename ++ ".pdf_tex}\n \
-\  }%"
+  | otherwise = "  \\\\%\n \
+\ \\centering \\parbox[c][0.2\\cardheight][c]{" ++ svgWidth ++ "\\cardwidth}{%\n \
+\   \\def\\svgwidth{" ++ svgWidth ++ "\\cardwidth}\n \
+\   \\input{" ++ pdfTexFilename ++ ".pdf_tex}\n \
+\ }%"
   where
     stks = strokes kanji
     svgWidth = show $ min 0.975 $ fromIntegral stks * 0.135
@@ -168,10 +174,10 @@ similarSubst sims = "    \\begin{TAB}(e,1cm,1cm){|c|}{|" ++ pattern ++ "|}\n" ++
     pattern = intersperse '|' $ fmap (const 'c') [0..l-1]
     boxes = concatMap toBox sims
     toBox (char, meaning) = "      \\parbox[c][1cm][c]{1cm}{%\n \
-\        \\centering\n \
-\        \\fontsize{22}{23}\\selectfont " ++ (char : "") ++ " \\\\\n \
-\        \\fontsize{5}{5}\\selectfont \\hspace{0pt}" ++ meaning ++ " \n \
-\      } \\\\\n"
+\       \\centering\n \
+\       \\fontsize{22}{23}\\selectfont " ++ (char : "") ++ " \\\\\n \
+\       \\fontsize{5}{5}\\selectfont \\hspace{0pt}" ++ meaning ++ " \n \
+\     } \\\\\n"
 
 loadSimilars kanjis similars kanji = kanji { similars = sims }
   where
@@ -179,9 +185,9 @@ loadSimilars kanjis similars kanji = kanji { similars = sims }
     kanjiChar = char kanji
     findMeaning c = (c, maybe "???" (head . meanings) $ find (\k -> char k == c) kanjis)
 
-loadCompounds freqList jmdic kanji = kanji { compounds = compounds }
+loadCompounds wordList jmdic kanji = kanji { compounds = compounds }
   where
-    compounds = fmap (\compound -> (compound,"…")) $ take 6 $ filter (elem $ char kanji) freqList 
+    compounds = fmap (\compound -> (compound,"…")) $ take 6 $ filter (elem $ char kanji) wordList 
 
 data Params = Params
   { debug :: Bool
@@ -230,24 +236,27 @@ generateFlashcards (Params debug input lang) = do
   
   similars <- fmap (fmap (take 4) . fmap (filter isCJK) . lines) $ readFile "resources/jyouyou__strokeEditDistance.csv"
 
-  freqList1 <- fmap lines $ readFile "resources/jpn_words_10000"
-  freqList2 <- fmap lines $ readFile "resources/jpn_words_15000"
+  wordList <- fmap lines $ readFile "resources/jpn_words"
 
   codepoints <- fmap (mkUniq . filter isCJK) $ readFile input
 
   let kanjisNoRad = concatMap (findElements $ simpleName "character") kanjidic
   let kanjisNoSims = fmap (loadRadicalData radicals krad . loadKanji lang) kanjisNoRad
   let kanjisNoCompounds = fmap (loadSimilars kanjisNoSims similars) kanjisNoSims
-  let kanjis = fmap (loadCompounds (freqList1 ++ freqList2) jmdic) kanjisNoCompounds
+  let kanjis = fmap (loadCompounds wordList jmdic) kanjisNoCompounds
 
 -- fmap (loadRadicalData radicals krad . (loadKanji lang)) chars
   let relevants = filter (\k -> elem (char k) codepoints) kanjis
+  let count = length relevants
 --  print relevants
 
   pdfTexs <- mapM pdfGen relevants
 --  print pdfTexs
+  let footer = "%unique flashcards generated: " ++ show count
+  let filler 0 = 0
+  let filler f = concat $ replicate (10 - f) "\\begin{flashcard}{}\\end{flashcard}"
   let flashcards = concatMap (uncurry $ insertKanji template_flashcard) $ zip relevants pdfTexs
-  let tex = insertFlashcards template flashcards
+  let tex = insertFlashcards template $ flashcards ++ "\n" ++ (filler $ count `mod` 10) ++ "\n" ++ footer
   --writeFile "demo.tex" tex
 
   --mapM_ print kanjis

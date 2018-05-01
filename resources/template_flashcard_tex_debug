@@ -25,7 +25,7 @@ ___KAKIKATA1___
     \centering
 ___SIMILAR_KANJIS___
   }%
-  } \\%
+  }%
 %drawing diagram, if  stroke count < 12
 ___KAKIKATA2___
 
@@ -35,22 +35,16 @@ ___KAKIKATA2___
 %front end
 }
 \vspace{5pt}
-\centering
-\fcolorbox{red}{yellow}{%
-\parbox{0.95\cardwidth}{%
-  \setstretch{0.8}
-  \raggedright
-  \fontsize{10}{10}\selectfont
-  ___ON_READINGS___
-  ___KUN_READINGS___
-  \fontsize{10}{12}\selectfont ___MEANINGS___ \\
-  \noindent\rule[5pt]{0.95\cardwidth}{0.5pt}%
-  \fontsize{10}{12}\selectfont
-  \begin{enumerate}[leftmargin=13pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\normalfont\small]
-    %up to 6 compound meanings like '    \item [hiragana] [translation]'
+\setstretch{0.8}
+\fontsize{10}{10}\selectfont
+___ON_READINGS___%
+___KUN_READINGS___%
+\fontsize{10}{12}\selectfont ___MEANINGS___ \\
+\noindent\rule[5pt]{0.95\cardwidth}{0.5pt}%
+\fontsize{10}{12}\selectfont
+\begin{enumerate}[leftmargin=13pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\normalfont\small]
+  %up to 6 compound meanings like '    \item [hiragana] [translation]'
 ___COMPOUND_TRANSLATIONS___
-  \end{enumerate}
-}%
-}%
+\end{enumerate}
 \end{flashcard}
 
