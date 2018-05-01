@@ -6,7 +6,6 @@
 \usepackage{xeCJK}
 \usepackage{enumitem}
 \usepackage[thinlines]{easytable}
-%\usepackage{xcolor}
 \usepackage{setspace}
 \usepackage{pstricks}
 
