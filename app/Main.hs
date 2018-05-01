@@ -70,7 +70,7 @@ boxesHeight kanji
     stks = strokes kanji
 
 kakikata1 pdfTexFilename kanji
-  | stks > 12 = "    \\def\\svgwidth{0.18\\cardinnerwidth}\n \
+  | stks > 12 = "    \\def\\svgwidth{0.15\\cardinnerwidth}\n \
 \   \\fontsize{6}{6}\\selectfont\n \
 \   \\input{" ++ pdfTexFilename ++ ".pdf_tex}"
   | otherwise = ""
