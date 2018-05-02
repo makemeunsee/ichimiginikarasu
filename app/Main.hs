@@ -1,10 +1,8 @@
 module Main where
 
 import System.Environment (getArgs)
-import Data.Char (ord)
-import Data.Maybe (fromJust, listToMaybe)
 import Data.String.Utils (replace)
-import Data.List (intersperse, find)
+import Data.List (intersperse)
 import System.Process (system)
 import Options.Applicative
 import Data.Semigroup ((<>))
@@ -13,11 +11,12 @@ import Data.Set (toList, fromList)
 import Kanjidic
 import XmlHelper
 import Types
+import Radicals
+import Similar
+import Compounds
 
 mkUniq :: Ord a => [a] -> [a]
 mkUniq = toList . fromList
-
-isCJK c = ord c >= 19968 && ord c <= 40879
 
 printMeanings :: [String] -> String
 printMeanings = concat . intersperse ", "
@@ -83,23 +82,6 @@ kakikata2 pdfTexFilename kanji
     stks = strokes kanji
     svgWidth = show $ min 0.975 $ fromIntegral stks * 0.135
 
-lineToRadical  = read
-
-lineToParts :: String -> (Char, [Char])
-lineToParts = read
-
-notComment ('#' : _) = False
-notComment _ = True
-
-loadRadicalData radicals krad kanji = kanji { radical = rad { r_char = realRad, r_strokes = realCount, r_meaning = meaning } }
-  where
-    rad = radical kanji
-    radNum = r_number $ radical kanji
-    kanjiChar = char kanji
-    (_, variants, meaning) = head $ filter (\(i,_,_) -> i == radNum) radicals
-    (_,parts) = head $ filter ((== kanjiChar) . fst) krad
-    (realRad, realCount) = maybe (head variants) id $ listToMaybe $ filter (\(k,_) -> elem k parts || k == kanjiChar) variants
-
 vgFilename :: Int -> String -> String
 vgFilename stks cp = "resources/kanji_vg/" ++ "0" ++ cp ++ qualifier
   where
@@ -126,16 +108,6 @@ similarSubst sims = "    \\begin{TAB}(e,1cm,1cm){|c|}{|" ++ pattern ++ "|}\n" ++
 \       \\fontsize{22}{23}\\selectfont " ++ (char : "") ++ " \\\\\n \
 \       \\fontsize{5}{5}\\selectfont \\hspace{0pt}" ++ meaning ++ " \n \
 \     } \\\\\n"
-
-loadSimilars kanjis similars kanji = kanji { similars = sims }
-  where
-    sims = maybe [('¤',"???")] (tail . fmap findMeaning) $ listToMaybe $ filter ((== kanjiChar) . head) similars
-    kanjiChar = char kanji
-    findMeaning c = (c, maybe "???" (head . meanings) $ find (\k -> char k == c) kanjis)
-
-loadCompounds wordList jmdic kanji = kanji { compounds = compounds }
-  where
-    compounds = fmap (\compound -> (compound,"…")) $ take 6 $ filter (elem $ char kanji) wordList 
 
 data Params = Params
   { debug :: Bool
@@ -175,23 +147,14 @@ generateFlashcards (Params debug input lang) = do
   template <- readFile "resources/template.tex"
   template_flashcard <- readFile $ flashcardTemplate debug 
 
-  -- jmdic <- fmap (onlyElems . parseXML) $ readFile "resources/JMdict"
-  let jmdic = []
-
-  radicals <- fmap (fmap lineToRadical . lines) $ readFile "resources/radicals_haskelled"
-
-  krad <- fmap (fmap lineToParts . filter notComment . lines) $ readFile "resources/kradfile-u_haskelled"
-  
-  similars <- fmap (fmap (take 4) . fmap (filter isCJK) . lines) $ readFile "resources/jyouyou__strokeEditDistance.csv"
-
-  wordList <- fmap lines $ readFile "resources/jpn_words"
-
   codepoints <- fmap (mkUniq . filter isCJK) $ readFile input
 
-  kanjisNoRad <- kanjis lang "resources/kanjidic2.xml"
-  let kanjisNoSims = fmap (loadRadicalData radicals krad) kanjisNoRad
-  let kanjisNoCompounds = fmap (loadSimilars kanjisNoSims similars) kanjisNoSims
-  let kanjis = fmap (loadCompounds wordList jmdic) kanjisNoCompounds
+  rawKanjis <- kanjis lang "resources/kanjidic2.xml"
+  loadRadical <- loadRadicalData "resources/radicals_haskelled" "resources/kradfile-u_haskelled"
+  loadSimilar <- loadSimilarKanjis rawKanjis "resources/jyouyou__strokeEditDistance.csv"
+  loadCompound <- loadCompounds "resources/jpn_words" "resources/JMdict"
+
+  let kanjis = fmap (loadCompound . loadSimilar . loadRadical) rawKanjis
 
 -- fmap (loadRadicalData radicals krad . (loadKanji lang)) chars
   let relevants = filter (\k -> elem (char k) codepoints) kanjis
