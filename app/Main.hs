@@ -220,11 +220,11 @@ main = generateFlashcards =<< execParser opts
      <> progDesc "Generate Latex kanji flashcards for all kanjis in file FILENAME"
      <> header "一右二烏 - a Kanji flashcards generation tool" ) 
 
-flashcardTemplate True = flashcardTemplate False ++ "_debug"
-flashcardTemplate False = "resources/template_flashcard_tex"
+flashcardTemplate False = "resources/template_flashcard.tex"
+flashcardTemplate True = "resources/template_flashcard_debug.tex"
 
 generateFlashcards (Params debug input lang) = do
-  template <- readFile "resources/template_tex"
+  template <- readFile "resources/template.tex"
   template_flashcard <- readFile $ flashcardTemplate debug 
 
   kanjidic <- fmap (onlyElems . parseXML) $ readFile "resources/kanjidic2.xml"

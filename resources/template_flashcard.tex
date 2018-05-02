@@ -1,5 +1,7 @@
 \begin{flashcard}{
-
+%
+\setlength{\heightlimit}{___BOXES_HEIGHT___\cardinnerheight}%
+%
 \parbox{\cardinnerwidth}{%
   \parbox[t][___BOXES_HEIGHT___\cardinnerheight][c]{0.4\cardinnerwidth}{%
     \centering
@@ -8,12 +10,21 @@
 %drawing diagram, if stroke count >= 12
 ___KAKIKATA1___
   }%
-  \parbox[t][___BOXES_HEIGHT___\cardinnerheight][t]{0.4\cardinnerwidth}{%
+  \setbox0=\hbox{%
+  \parbox[t][\height][t]{0.4\cardinnerwidth}{%
     \fontsize{13}{12}\selectfont
     \begin{enumerate}[leftmargin=20pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\normalfont\normalsize]
       %up to 6 compounds like '      \item ...'
 ___COMPOUNDS___
     \end{enumerate}%
+  }%
+  }%
+  \myheight=\ht0 \advance\myheight by \dp0%
+  \ifthenelse{\myheight > \heightlimit}{%
+  \GenericWarning{}{error, content too big, \the\myheight, max: \the\heightlimit}%
+  \box0%
+  }{%
+  \box0%
   }%
   \parbox[t][___BOXES_HEIGHT___\cardinnerheight][c]{0.18\cardinnerwidth}{%
     \centering
@@ -27,7 +38,6 @@ ___KAKIKATA2___
 %front end
 }
 \centering
-\newdimen\height
 \setbox0=\hbox{
 \parbox{0.95\cardinnerwidth}{
 \vspace{5pt}
@@ -44,9 +54,10 @@ ___COMPOUND_TRANSLATIONS___
 \end{enumerate}
 }
 }
-\height=\ht0 \advance\height by \dp0
-\ifthenelse{\height > \cardinnerheight}{
-content too big, \the\height, max: \the\cardinnerheight%failure!
+\myheight=\ht0 \advance\myheight by \dp0
+\ifthenelse{\myheight > \cardinnerheight}{
+\GenericWarning{}{error, content too big, \the\myheight, max: \the\cardinnerheight}
+\box0
 }{
 \box0
 }
