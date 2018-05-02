@@ -1,6 +1,5 @@
 module Main where
 
-import System.Environment (getArgs)
 import Data.String.Utils (replace)
 import Data.List (intersperse)
 import System.Process (system)
