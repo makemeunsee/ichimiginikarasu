@@ -1,9 +1,6 @@
 module Main where
 
 import System.Environment (getArgs)
-import Text.XML.Light.Input
-import Text.XML.Light.Proc
-import Text.XML.Light.Types
 import Data.Char (ord)
 import Data.Maybe (fromJust, listToMaybe)
 import Data.String.Utils (replace)
@@ -13,14 +10,12 @@ import Options.Applicative
 import Data.Semigroup ((<>))
 import Data.Set (toList, fromList)
 
+import Kanjidic
+import XmlHelper
+import Types
+
 mkUniq :: Ord a => [a] -> [a]
 mkUniq = toList . fromList
-
-data Radical = Radical { r_number :: Int, r_char :: Char, r_strokes :: Int, r_meaning :: String }
-  deriving ( Show, Eq )
-
-data Kanji = Kanji { char :: Char, codepoint :: String, radical :: Radical, strokes :: Int, onReadings :: [String], kunReadings :: [String], meanings :: [String], similars :: [(Char, String)], compounds :: [(String, String)] }
-  deriving ( Show, Eq )
 
 isCJK c = ord c >= 19968 && ord c <= 40879
 
@@ -41,7 +36,7 @@ substitutions =
   , ("___STROKES___", show . strokes)
   , ("___RADICAL___", (: []) . r_char . radical)
   , ("___RADICAL_MEANING___", r_meaning . radical)
-  , ("___ON_READINGS___",  suffixIfNotEmpty " \\\\[4pt]" . printReadings . onReadings)
+  , ("___ON_READINGS___",  suffixIfNotEmpty " \\\\[2pt]" . printReadings . onReadings)
   , ("___KUN_READINGS___", suffixIfNotEmpty " \\\\[2pt]" . printReadings . kunReadings)
   , ("___MEANINGS___", printMeanings . meanings)
   , ("___BOXES_HEIGHT___", boxesHeight)
@@ -87,53 +82,6 @@ kakikata2 pdfTexFilename kanji
   where
     stks = strokes kanji
     svgWidth = show $ min 0.975 $ fromIntegral stks * 0.135
-
-simpleName s = QName s Nothing Nothing
-
-findDeepElements :: [String] -> Element -> [Element]
-findDeepElements names element = findDeepElements' names [element]
-  where
-    findDeepElements' (name : names) elements = findDeepElements' names $ concatMap (findElements $ simpleName name) elements
-    findDeepElements' _ elements = elements
-
-noAttrFilter attrName = (== Nothing) . findAttr (simpleName attrName)
-attrFilter attrName attrValue = (== Just attrValue) . findAttr (simpleName attrName)
-
-placeHolderRadical :: Int -> Radical
-placeHolderRadical number = Radical { r_number = number, r_char = '?', r_strokes = 0, r_meaning = "???" }
-
-langFilter "en" = noAttrFilter "m_lang"
-langFilter str = attrFilter "m_lang" str
-
-safeStrContent = escapeTex . strContent
-  where
-    escapeTex ('%' : t) = "\\%" ++ escapeTex t
-    escapeTex ('&' : t) = "\\&" ++ escapeTex t
-    escapeTex ('$' : t) = "\\$" ++ escapeTex t
-    escapeTex ('#' : t) = "\\#" ++ escapeTex t
-    escapeTex ('_' : t) = "\\_" ++ escapeTex t
-    escapeTex ('{' : t) = "\\{" ++ escapeTex t
-    escapeTex ('}' : t) = "\\}" ++ escapeTex t
-    escapeTex ('~' : t) = "\\textasciitilde" ++ escapeTex t
-    escapeTex ('^' : t) = "\\textasciicircum" ++ escapeTex t
-    escapeTex ('\\' : t) = "\\textbackslash" ++ escapeTex t
-    escapeTex (h : t) = h : escapeTex t
-    escapeTex [] = []
-
-loadKanji :: String -> Element -> Kanji
-loadKanji lang kanjiEntry = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = [('¤',"???")], compounds = [("???","???")] }
-  where
-    isUCS = attrFilter "cp_type" "ucs"
-    cpValues = findDeepElements ["codepoint", "cp_value"] kanjiEntry
-    codepoint = strContent $ head $ filter isUCS cpValues
-    char = head $ safeStrContent $ head $ findDeepElements ["literal"] kanjiEntry
-    radValues = findDeepElements ["radical", "rad_value"] kanjiEntry
-    isClassical = attrFilter "rad_type" "classical"
-    radical = read $ strContent $ head $ filter isClassical radValues
-    strokes = read $ strContent $ head $ findDeepElements ["misc", "stroke_count"] kanjiEntry
-    kunReadings = fmap safeStrContent $ filter (attrFilter "r_type" "ja_kun") $ findDeepElements ["reading_meaning", "rmgroup", "reading"] kanjiEntry
-    onReadings = fmap safeStrContent $ filter (attrFilter "r_type" "ja_on") $ findDeepElements ["reading_meaning", "rmgroup", "reading"] kanjiEntry
-    meanings = fmap safeStrContent $ filter (langFilter lang) $ findDeepElements ["reading_meaning", "rmgroup", "meaning"] kanjiEntry
 
 lineToRadical  = read
 
@@ -227,8 +175,8 @@ generateFlashcards (Params debug input lang) = do
   template <- readFile "resources/template.tex"
   template_flashcard <- readFile $ flashcardTemplate debug 
 
-  kanjidic <- fmap (onlyElems . parseXML) $ readFile "resources/kanjidic2.xml"
-  jmdic <- fmap (onlyElems . parseXML) $ readFile "resources/JMdict"
+  -- jmdic <- fmap (onlyElems . parseXML) $ readFile "resources/JMdict"
+  let jmdic = []
 
   radicals <- fmap (fmap lineToRadical . lines) $ readFile "resources/radicals_haskelled"
 
@@ -240,8 +188,8 @@ generateFlashcards (Params debug input lang) = do
 
   codepoints <- fmap (mkUniq . filter isCJK) $ readFile input
 
-  let kanjisNoRad = concatMap (findElements $ simpleName "character") kanjidic
-  let kanjisNoSims = fmap (loadRadicalData radicals krad . loadKanji lang) kanjisNoRad
+  kanjisNoRad <- kanjis lang "resources/kanjidic2.xml"
+  let kanjisNoSims = fmap (loadRadicalData radicals krad) kanjisNoRad
   let kanjisNoCompounds = fmap (loadSimilars kanjisNoSims similars) kanjisNoSims
   let kanjis = fmap (loadCompounds wordList jmdic) kanjisNoCompounds
 
