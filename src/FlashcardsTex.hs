@@ -6,6 +6,7 @@ import Data.List (intersperse)
 import System.Process (system)
 import Data.Text (Text,pack,unpack,append,intercalate,replace)
 import qualified Data.Text.IO as TIO
+
 import Types
 
 generateTex :: Bool -> [Kanji] -> IO Text

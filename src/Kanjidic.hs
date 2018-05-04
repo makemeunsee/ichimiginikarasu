@@ -2,41 +2,48 @@
 
 module Kanjidic (kanjis) where
 
-import Text.XML.Light.Input
-import Text.XML.Light.Proc
-import Text.XML.Light.Types
-import Data.Text (Text, unpack, pack)
+import qualified Data.Text.IO as TIO
+import qualified Data.Text as T
+import qualified Data.Text.Read as T
+import Data.Text (Text, pack, append)
+import GHC.IO.Handle.FD (stderr)
+import qualified Data.ByteString.Lazy as L
+import Text.XML.Expat.Tree
 
-import XmlHelper
 import Types
+import XmlHelper
+
+import Debug.Trace
 
 kanjis :: Text -> FilePath -> IO [Kanji]
 kanjis lang path = do
-  kanjidic <- loadKanjidic path
-  let kanjiElements = concatMap (findElements $ simpleName "character") kanjidic
-  return $ fmap (loadKanji lang) kanjiElements
+  kanjidicRaw <- L.readFile path
+  let (kanjidic, mErr) = parse defaultParseOptions kanjidicRaw :: (NodeG [] Text Text, Maybe XMLParseError)
 
+  let charNodes = filterDeepNodes ["character"] kanjidic
+
+  case mErr of
+    Nothing -> return $ fmap (loadKanji lang) charNodes
+    Just err -> do
+      TIO.hPutStrLn stderr $ "XML parse failed: " `append` (pack $ show err)
+      return []
+
+loadKanji lang charNode = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = [('¤',"???")], compounds = [ Compound "???" "???" [] ] }
+  where
+    isUCS = attrFilter "cp_type" "ucs"
+    cpValues = filterDeepNodes ["codepoint", "cp_value"] charNode
+    codepoint = unsafeText $ head $ filter isUCS cpValues
+    char = T.head $ unsafeText $ head $ filterDeepNodes ["literal"] charNode
+    radValues = filterDeepNodes ["radical", "rad_value"] charNode
+    isClassical = attrFilter "rad_type" "classical"
+    radical = read $ T.unpack $ unsafeText $ head $ filter isClassical radValues
+    strokes = read $ T.unpack $ unsafeText $ head $ filterDeepNodes ["misc", "stroke_count"] charNode
+    kunReadings = fmap unsafeText $ filter (attrFilter "r_type" "ja_kun") $ filterDeepNodes ["reading_meaning", "rmgroup", "reading"] charNode
+    onReadings = fmap unsafeText $ filter (attrFilter "r_type" "ja_on") $ filterDeepNodes ["reading_meaning", "rmgroup", "reading"] charNode
+    meanings = fmap unsafeText $ filter (langFilter lang) $ filterDeepNodes ["reading_meaning", "rmgroup", "meaning"] charNode
+    
 langFilter "en" = noAttrFilter "m_lang"
 langFilter str = attrFilter "m_lang" str
 
-loadKanjidic :: FilePath -> IO [Element]
-loadKanjidic = fmap (onlyElems . parseXML) . readFile
-
-loadKanji :: Text -> Element -> Kanji
-loadKanji lang kanjiEntry = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = [('¤',"???")], compounds = [ Compound "???" "???" [] ] }
-  where
-    isUCS = attrFilter "cp_type" "ucs"
-    cpValues = filterDeepElements ["codepoint", "cp_value"] kanjiEntry
-    codepoint = pack $ strContent $ head $ filter isUCS cpValues
-    char = head $ safeStrContent $ head $ filterDeepElements ["literal"] kanjiEntry
-    radValues = filterDeepElements ["radical", "rad_value"] kanjiEntry
-    isClassical = attrFilter "rad_type" "classical"
-    radical = read $ strContent $ head $ filter isClassical radValues
-    strokes = read $ strContent $ head $ filterDeepElements ["misc", "stroke_count"] kanjiEntry
-    kunReadings = fmap (pack . safeStrContent) $ filter (attrFilter "r_type" "ja_kun") $ filterDeepElements ["reading_meaning", "rmgroup", "reading"] kanjiEntry
-    onReadings = fmap (pack . safeStrContent) $ filter (attrFilter "r_type" "ja_on") $ filterDeepElements ["reading_meaning", "rmgroup", "reading"] kanjiEntry
-    meanings = fmap (pack . safeStrContent) $ filter (langFilter $ unpack lang) $ filterDeepElements ["reading_meaning", "rmgroup", "meaning"] kanjiEntry
-
 placeHolderRadical :: Int -> Radical
 placeHolderRadical number = Radical { r_number = number, r_char = '?', r_strokes = 0, r_meaning = "???" }
-

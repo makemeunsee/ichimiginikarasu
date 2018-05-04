@@ -20,7 +20,6 @@ library
                      , Compounds
                      , FlashcardsTex
   build-depends:       base >= 4.7 && < 5
-                     , xml
                      , process
                      , hexpat
                      , bytestring
