@@ -1,4 +1,4 @@
-module XmlHelper (simpleName, attrFilter, noAttrFilter, findDeepElements) where
+module XmlHelper (simpleName, attrFilter, noAttrFilter, safeStrContent, filterDeepElements) where
 
 import Text.XML.Light.Types
 import Text.XML.Light.Proc
@@ -10,9 +10,24 @@ noAttrFilter attrName = (== Nothing) . findAttr (simpleName attrName)
 
 attrFilter attrName attrValue = (== Just attrValue) . findAttr (simpleName attrName)
 
-findDeepElements :: [String] -> Element -> [Element]
-findDeepElements names element = findDeepElements' names [element]
+filterDeepElements :: [String] -> Element -> [Element]
+filterDeepElements names element = filterDeepElements' names [element]
   where
-    findDeepElements' (name : names) elements = findDeepElements' names $ concatMap (findElements $ simpleName name) elements
-    findDeepElements' _ elements = elements
+    filterDeepElements' (name : names) elements = filterDeepElements' names $ concatMap (filterChildrenName ((== name) . qName)) elements
+    filterDeepElements' _ elements = elements
+
+safeStrContent = escapeTex . strContent
+  where
+    escapeTex ('%' : t) = "\\%" ++ escapeTex t
+    escapeTex ('&' : t) = "\\&" ++ escapeTex t
+    escapeTex ('$' : t) = "\\$" ++ escapeTex t
+    escapeTex ('#' : t) = "\\#" ++ escapeTex t
+    escapeTex ('_' : t) = "\\_" ++ escapeTex t
+    escapeTex ('{' : t) = "\\{" ++ escapeTex t
+    escapeTex ('}' : t) = "\\}" ++ escapeTex t
+    escapeTex ('~' : t) = "\\textasciitilde" ++ escapeTex t
+    escapeTex ('^' : t) = "\\textasciicircum" ++ escapeTex t
+    escapeTex ('\\' : t) = "\\textbackslash" ++ escapeTex t
+    escapeTex (h : t) = h : escapeTex t
+    escapeTex [] = []
 

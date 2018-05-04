@@ -1,7 +1,11 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Similar (loadSimilarKanjis) where
 
 import Data.List (find)
 import Data.Maybe (listToMaybe)
+import Data.Text (Text)
+
 import Types
 
 loadSimilarKanjis :: [Kanji] -> FilePath -> IO (Kanji -> Kanji)

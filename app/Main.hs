@@ -1,8 +1,13 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
 import Options.Applicative
 import Data.Semigroup ((<>))
 import Data.Set (toList, fromList)
+import Data.Text (Text, pack)
+import Data.Text.IO (hPutStrLn)
+import GHC.IO.Handle.FD (stdout)
 
 import Kanjidic
 import XmlHelper
@@ -70,7 +75,7 @@ main = generateFlashcards =<< execParser opts
 
 generateFlashcards (Params debug input lang kanjidic jmdic freqlist) = do
   codepoints <- fmap (mkUniq . filter isCJK) $ readFile input
-  rawKanjis <- kanjis lang kanjidic
+  rawKanjis <- kanjis (pack lang) kanjidic
   loadRadical <- loadRadicalData "resources/radicals_haskelled" "resources/kradfile-u_haskelled"
   loadSimilar <- loadSimilarKanjis rawKanjis "resources/jyouyou__strokeEditDistance.csv"
   loadCompound <- loadCompounds freqlist jmdic
@@ -82,4 +87,4 @@ generateFlashcards (Params debug input lang kanjidic jmdic freqlist) = do
 --  print relevants
   
   texContent <- generateTex debug relevants
-  putStrLn texContent
+  hPutStrLn stdout texContent

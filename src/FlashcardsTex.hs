@@ -1,78 +1,79 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module FlashcardsTex (generateTex) where
 
-import Data.String.Utils (replace)
 import Data.List (intersperse)
 import System.Process (system)
+import Data.Text (Text,pack,unpack,append,intercalate,replace)
+import qualified Data.Text.IO as TIO
 import Types
 
-generateTex :: Bool -> [Kanji] -> IO String
+generateTex :: Bool -> [Kanji] -> IO Text
 generateTex debug kanjis = do
   let count = length kanjis
-  template <- readFile "resources/template.tex"
-  template_flashcard <- readFile $ flashcardTemplate debug 
+  template <- TIO.readFile "resources/template.tex"
+  template_flashcard <- TIO.readFile $ flashcardTemplate debug 
 
   pdfTexs <- mapM pdfGen kanjis
---  print pdfTexs
-  let footer = "%unique flashcards generated: " ++ show count
-  let filler 0 = 0
-  let filler f = concat $ replicate (10 - f) "\\begin{flashcard}{}\\end{flashcard}"
-  let flashcards = concatMap (uncurry $ insertKanji template_flashcard) $ zip kanjis pdfTexs
-  return $ insertFlashcards template $ flashcards ++ "\n" ++ (filler $ count `mod` 10) ++ "\n" ++ footer
+
+  let footer = "%unique flashcards generated: " `append` (pack $ show count)
+  let filler 0 = ""
+  let filler f = foldr append "" $ replicate (10 - f) "\\begin{flashcard}{}\\end{flashcard}"
+
+  let flashcards = foldr append "" $ fmap (uncurry $ insertKanji template_flashcard) $ zip kanjis pdfTexs
+
+  return $ insertFlashcards template $ flashcards `append` "\n" `append` (filler $ count `mod` 10) `append` "\n" `append` footer
 
 flashcardTemplate False = "resources/template_flashcard.tex"
 flashcardTemplate True = "resources/template_flashcard_debug.tex"
 
-vgFilename :: Int -> String -> String
-vgFilename stks cp = "resources/kanji_vg/" ++ "0" ++ cp ++ qualifier
+vgFilename :: Int -> Text -> Text
+vgFilename stks cp = "resources/kanji_vg/" `append` "0" `append` cp `append` qualifier
   where
     qualifier
       | stks > 12 = ""
       | otherwise = "_frames"
 
-pdfGen :: Kanji -> IO String
+pdfGen :: Kanji -> IO Text
 pdfGen kanji = do
-  _ <- system $ "inkscape -D -z --file=" ++ filename ++ ".svg --export-pdf=" ++ filename ++ ".pdf --export-latex"
+  let cp = codepoint kanji
+  let stks = strokes kanji
+  let filename = vgFilename stks cp
+  _ <- system $ "inkscape -D -z --file=" ++ (unpack filename) ++ ".svg --export-pdf=" ++ (unpack filename) ++ ".pdf --export-latex"
   return filename
-  where
-    filename = vgFilename stks cp
-    stks = strokes kanji
-    cp = codepoint kanji
 
-printMeanings :: [String] -> String
-printMeanings = concat . intersperse ", "
-printReadings :: [String] -> String
-printReadings = printMeanings . fmap (\s -> "\\mbox{" ++ s ++ "}")
---printReadings readings = concat . intersperse ", " . fmap (\s -> "\\mbox{" ++ s ++ "}") $ truncReadings
--- where
---   truncReadings = mkUniq $ fmap (takeWhile (/= '.')) readings
+printMeanings :: [Text] -> Text
+printMeanings = intercalate ", "
+printReadings :: [Text] -> Text
+printReadings = printMeanings . fmap (\s -> "\\mbox{" `append` s `append` "}")
 
 suffixIfNotEmpty _ "" = ""
-suffixIfNotEmpty suff str = str ++ suff
+suffixIfNotEmpty suff str = str `append` suff
 
-substitutions :: [(String, Kanji -> String)]
+substitutions :: [(Text, Kanji -> Text)]
 substitutions =
-  [ ("___KANJI___", (: []) . char)
-  , ("___STROKES___", show . strokes)
-  , ("___RADICAL___", (: []) . r_char . radical)
+  [ ("___KANJI___", pack . (: []) . char)
+  , ("___STROKES___", pack . show . strokes)
+  , ("___RADICAL___", pack . (: []) . r_char . radical)
   , ("___RADICAL_MEANING___", r_meaning . radical)
   , ("___ON_READINGS___",  suffixIfNotEmpty " \\\\[2pt]" . printReadings . onReadings)
   , ("___KUN_READINGS___", suffixIfNotEmpty " \\\\[2pt]" . printReadings . kunReadings)
   , ("___MEANINGS___", printMeanings . meanings)
   , ("___BOXES_HEIGHT___", boxesHeight)
   , ("___SIMILAR_KANJIS___", similarSubst . similars)
-  , ("___COMPOUNDS___", makeCompounds fst)
-  , ("___COMPOUND_TRANSLATIONS___", makeCompounds snd)
+  , ("___COMPOUNDS___", makeCompounds kanjide)
+  , ("___COMPOUND_TRANSLATIONS___", makeCompounds reading)
   ]
 
-makeCompounds which = concat . intersperse "\n" . fmap ("      \\item " ++) . fmap which . take 6 . withFallback . compounds
+makeCompounds which = intercalate "\n" . fmap ("      \\item " `append`) . fmap which . take 6 . withFallback . compounds
   where
-    withFallback [] = [("¤","¤")]
+    withFallback [] = [Compound "¤" "¤" []]
     withFallback l = l
 
-applySubstitution :: Kanji -> String -> (String, Kanji -> String) -> String
+applySubstitution :: Kanji -> Text -> (Text, Kanji -> Text) -> Text
 applySubstitution kanji string (toReplace, extractor) = replace toReplace (extractor kanji) string
 
-insertKanji :: String -> Kanji -> String -> String
+insertKanji :: Text -> Kanji -> Text -> Text
 insertKanji flashcardTemplate kanji pdfTexFilename = foldl (applySubstitution kanji) flashcardTemplate $ ("___KAKIKATA1___", kakikata1 pdfTexFilename) : ("___KAKIKATA2___", kakikata2 pdfTexFilename) : substitutions 
 
 insertFlashcards string cards = replace "___FLASHCARDS___" cards string
@@ -86,7 +87,7 @@ boxesHeight kanji
 kakikata1 pdfTexFilename kanji
   | stks > 12 = "    \\def\\svgwidth{0.15\\cardinnerwidth}\n \
 \   \\fontsize{6}{6}\\selectfont\n \
-\   \\input{" ++ pdfTexFilename ++ ".pdf_tex}"
+\   \\input{" `append` pdfTexFilename `append` ".pdf_tex}"
   | otherwise = ""
   where
     stks = strokes kanji
@@ -94,22 +95,22 @@ kakikata1 pdfTexFilename kanji
 kakikata2 pdfTexFilename kanji
   | stks > 12 = ""
   | otherwise = "  \\\\%\n \
-\ \\centering \\parbox[c][0.2\\cardheight][c]{" ++ svgWidth ++ "\\cardinnerwidth}{%\n \
-\   \\def\\svgwidth{" ++ svgWidth ++ "\\cardinnerwidth}\n \
-\   \\input{" ++ pdfTexFilename ++ ".pdf_tex}\n \
+\ \\centering \\parbox[c][0.2\\cardheight][c]{" `append` svgWidth `append` "\\cardinnerwidth}{%\n \
+\   \\def\\svgwidth{" `append` svgWidth `append` "\\cardinnerwidth}\n \
+\   \\input{" `append` pdfTexFilename `append` ".pdf_tex}\n \
 \ }%"
   where
     stks = strokes kanji
-    svgWidth = show $ min 0.975 $ fromIntegral stks * 0.135
+    svgWidth = pack $ show $ min 0.975 $ fromIntegral stks * 0.135
 
-similarSubst sims = "    \\begin{TAB}(e,1cm,1cm){|c|}{|" ++ pattern ++ "|}\n" ++ boxes ++ "    \\end{TAB}%"
+similarSubst sims = "    \\begin{TAB}(e,1cm,1cm){|c|}{|" `append` pattern `append` "|}\n" `append` boxes `append` "    \\end{TAB}%"
   where
     l = length sims
-    pattern = intersperse '|' $ fmap (const 'c') [0..l-1]
-    boxes = concatMap toBox sims
+    pattern = pack $ intersperse '|' $ fmap (const 'c') [0..l-1]
+    boxes = foldr append "" $ fmap toBox sims
     toBox (char, meaning) = "      \\parbox[c][1cm][c]{1cm}{%\n \
 \       \\centering\n \
-\       \\fontsize{22}{23}\\selectfont " ++ (char : "") ++ " \\\\\n \
-\       \\fontsize{5}{5}\\selectfont \\hspace{0pt}" ++ meaning ++ " \n \
+\       \\fontsize{22}{23}\\selectfont " `append` (pack $ char : "") `append` " \\\\\n \
+\       \\fontsize{5}{5}\\selectfont \\hspace{0pt}" `append` meaning `append` " \n \
 \     } \\\\\n"
 
