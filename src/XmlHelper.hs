@@ -23,27 +23,3 @@ noAttrFilter attrName = all ((/= attrName) . fst) . getAttributes
 attrFilter :: Text -> Text -> NodeG [] Text Text -> Bool
 attrFilter attrName attrValue = any (== (attrName, attrValue)) . getAttributes
 
---simpleName :: String -> QName
---simpleName s = QName s Nothing Nothing
-
---filterDeepElements :: [String] -> Element -> [Element]
---filterDeepElements names element = filterDeepElements' names [element]
---  where
---    filterDeepElements' (name : names) elements = filterDeepElements' names $ concatMap (filterChildrenName ((== name) . qName)) elements
---    filterDeepElements' _ elements = elements
---
---safeStrContent = escapeTex . strContent
---  where
---    escapeTex ('%' : t) = "\\%" ++ escapeTex t
---    escapeTex ('&' : t) = "\\&" ++ escapeTex t
---    escapeTex ('$' : t) = "\\$" ++ escapeTex t
---    escapeTex ('#' : t) = "\\#" ++ escapeTex t
---    escapeTex ('_' : t) = "\\_" ++ escapeTex t
---    escapeTex ('{' : t) = "\\{" ++ escapeTex t
---    escapeTex ('}' : t) = "\\}" ++ escapeTex t
---    escapeTex ('~' : t) = "\\textasciitilde" ++ escapeTex t
---    escapeTex ('^' : t) = "\\textasciicircum" ++ escapeTex t
---    escapeTex ('\\' : t) = "\\textbackslash" ++ escapeTex t
---    escapeTex (h : t) = h : escapeTex t
---    escapeTex [] = []
---

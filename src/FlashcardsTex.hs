@@ -43,10 +43,12 @@ pdfGen kanji = do
   _ <- system $ "inkscape -D -z --file=" ++ (unpack filename) ++ ".svg --export-pdf=" ++ (unpack filename) ++ ".pdf --export-latex"
   return filename
 
-printMeanings :: [Text] -> Text
-printMeanings = intercalate ", "
-printReadings :: [Text] -> Text
-printReadings = printMeanings . fmap (\s -> "\\mbox{" `append` s `append` "}")
+printTexts :: (Text -> Text) -> [Text] -> Text
+printTexts f = intercalate ", " . fmap f
+
+printMeanings = printTexts escapeTex
+
+printReadings = printTexts $ (\s -> "\\mbox{" `append` s `append` "}") . escapeTex
 
 suffixIfNotEmpty _ "" = ""
 suffixIfNotEmpty suff str = str `append` suff
@@ -56,7 +58,7 @@ substitutions =
   [ ("___KANJI___", pack . (: []) . char)
   , ("___STROKES___", pack . show . strokes)
   , ("___RADICAL___", pack . (: []) . r_char . radical)
-  , ("___RADICAL_MEANING___", r_meaning . radical)
+  , ("___RADICAL_MEANING___", escapeTex . r_meaning . radical)
   , ("___ON_READINGS___",  suffixIfNotEmpty " \\\\[2pt]" . printReadings . onReadings)
   , ("___KUN_READINGS___", suffixIfNotEmpty " \\\\[2pt]" . printReadings . kunReadings)
   , ("___MEANINGS___", printMeanings . meanings)
@@ -66,7 +68,7 @@ substitutions =
   , ("___COMPOUND_TRANSLATIONS___", makeCompounds reading)
   ]
 
-makeCompounds which = intercalate "\n" . fmap ("      \\item " `append`) . fmap which . take 6 . withFallback . compounds
+makeCompounds which = intercalate "\n" . fmap (("      \\item " `append`) . escapeTex . which) . take 6 . withFallback . compounds
   where
     withFallback [] = [Compound "¤" "¤" []]
     withFallback l = l
@@ -112,6 +114,23 @@ similarSubst sims = "    \\begin{TAB}(e,1cm,1cm){|c|}{|" `append` pattern `appen
     toBox (char, meaning) = "      \\parbox[c][1cm][c]{1cm}{%\n \
 \       \\centering\n \
 \       \\fontsize{22}{23}\\selectfont " `append` (pack $ char : "") `append` " \\\\\n \
-\       \\fontsize{5}{5}\\selectfont \\hspace{0pt}" `append` meaning `append` " \n \
+\       \\fontsize{5}{5}\\selectfont \\hspace{0pt}" `append` (escapeTex meaning) `append` " \n \
 \     } \\\\\n"
+
+escapeTex :: Text -> Text
+escapeTex text = foldr (\(from, to) t -> replace from to t) text escapes
+
+escapes :: [(Text, Text)]
+escapes =
+  [ ("%", "\\%")
+  , ("&", "\\&")
+  , ("$", "\\$")
+  , ("#", "\\#")
+  , ("_", "\\_")
+  , ("{", "\\{")
+  , ("}", "\\}")
+  , ("~", "\\textasciitilde")
+  , ("^", "\\textasciicircum")
+  , ("\\", "\\textbackslash")
+  ]
 
