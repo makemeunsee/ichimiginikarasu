@@ -64,14 +64,22 @@ substitutions =
   , ("___MEANINGS___", printMeanings . meanings)
   , ("___BOXES_HEIGHT___", boxesHeight)
   , ("___SIMILAR_KANJIS___", similarSubst . similars)
-  , ("___COMPOUNDS___", makeCompounds kanjide)
-  , ("___COMPOUND_TRANSLATIONS___", makeCompounds reading)
+  , ("___COMPOUNDS___", withFixesOr "\\hspace{1pt}" compoundsPrefix compoundsSuffix . makeCompounds kanjide)
+  , ("___COMPOUND_TRANSLATIONS___", withFixesOr "-" compoundsReadingPrefix compoundsReadingSuffix . makeCompounds reading)
   ]
 
-makeCompounds which = intercalate "\n" . fmap (("      \\item " `append`) . escapeTex . which) . take 6 . withFallback . compounds
-  where
-    withFallback [] = [Compound "¤" "¤" []]
-    withFallback l = l
+compoundsPrefix = "    \\begin{enumerate}[leftmargin=20pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\\normalfont\\normalsize]\n"
+
+compoundsSuffix = "\n    \\end{enumerate}%"
+
+compoundsReadingPrefix = "\\begin{enumerate}[leftmargin=13pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\\normalfont\\small]%\n"
+
+compoundsReadingSuffix = "\n\\end{enumerate}%"
+
+withFixesOr text _ _ "" = text
+withFixesOr _ prefix suffix text = prefix `append` text `append` suffix
+
+makeCompounds which = intercalate "\n" . fmap (("      \\item " `append`) . escapeTex . which) . compounds
 
 applySubstitution :: Kanji -> Text -> (Text, Kanji -> Text) -> Text
 applySubstitution kanji string (toReplace, extractor) = replace toReplace (extractor kanji) string

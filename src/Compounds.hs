@@ -36,11 +36,18 @@ loadCompounds noDictFilling freqListPath jmdicPath = do
       return id
 
 compoundsMap :: NodeG [] Text Text -> M.Map Text Compound
-compoundsMap jmdic = M.fromList $ concatMap toCompounds $ filterDeepNodes ["entry"] jmdic
+compoundsMap jmdic = M.fromListWith selectFirst $ concatMap toCompounds $ filterDeepNodes ["entry"] jmdic
+
+selectFirst c0@(Compound uid0 _ _ _) c1@(Compound uid1 _ _ _)
+  | uid0 < uid1 = c0
+  | otherwise = c1
 
 toCompounds node = fmap (\k -> (k, toCompound k node)) kebs
   where
     kebs = fmap unsafeText $ filterDeepNodes ["k_ele", "keb"] node
 
-toCompound keb node = Compound keb "?" []
+toCompound keb node = Compound uid keb reading []
+  where
+    uid = read $ T.unpack $ unsafeText $ head $ filterDeepNodes ["ent_seq"] node
+    reading = unsafeText $ head $ filterDeepNodes ["r_ele", "reb"] node
 

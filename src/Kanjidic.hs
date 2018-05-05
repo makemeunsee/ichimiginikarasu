@@ -28,7 +28,7 @@ kanjis lang path = do
       TIO.hPutStrLn stderr $ "XML parse failed: " `append` (pack $ show err)
       return []
 
-loadKanji lang charNode = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = [('¤',"???")], compounds = [ Compound "???" "???" [] ] }
+loadKanji lang charNode = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = [('¤',"???")], compounds = [ Compound 0 "???" "???" [] ] }
   where
     isUCS = attrFilter "cp_type" "ucs"
     cpValues = filterDeepNodes ["codepoint", "cp_value"] charNode

@@ -11,12 +11,10 @@
 ___KAKIKATA1___
   }%
   \setbox0=\hbox{%
-  \parbox[t][\height][t]{0.4\cardinnerwidth}{%
+  \parbox[t][\height][c]{0.4\cardinnerwidth}{%
     \fontsize{13}{12}\selectfont
-    \begin{enumerate}[leftmargin=20pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\normalfont\normalsize]
-      %up to 6 compounds like '      \item ...'
+    %up to 6 compounds like '      \item ...'
 ___COMPOUNDS___
-    \end{enumerate}%
   }%
   }%
   \myheight=\ht0 \advance\myheight by \dp0%
@@ -47,13 +45,11 @@ ___ON_READINGS___%
 ___KUN_READINGS___%
 \fontsize{10}{12}\selectfont ___MEANINGS___ \\[-3pt]
 \rule[1pt]{0.95\cardinnerwidth}{0.5pt}
-\begin{multicols}{2}[]
+\begin{multicols}{2}[]%
 \fontsize{10}{12}\selectfont
-\begin{enumerate}[leftmargin=13pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\normalfont\small]
-  %up to 6 compound meanings like '    \item [hiragana] [translation]'
+%up to 6 compound meanings like '    \item [hiragana] [translation]'
 ___COMPOUND_TRANSLATIONS___
-\end{enumerate}
-\end{multicols}
+\end{multicols}%
 }
 }
 \myheight=\ht0 \advance\myheight by \dp0
