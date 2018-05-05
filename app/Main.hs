@@ -27,6 +27,7 @@ data Params = Params
   , kanjidicPath :: FilePath
   , jmdicPath :: FilePath
   , wordsPath :: FilePath
+  , noDictFilling :: Bool
   }
 
 params :: Parser Params
@@ -64,6 +65,10 @@ params = Params
     <> showDefault
     <> value "resources/jpn_words"
     <> help "the path to the text file (one word / line) used to select compounds from" )
+  <*> switch
+     ( long "no-dict-fill"
+    <> short 'n'
+    <> help "do not look for compounds in the dictionary if the frequency list gets exhausted" )
 
 main :: IO ()
 main = generateFlashcards =<< execParser opts
@@ -73,18 +78,17 @@ main = generateFlashcards =<< execParser opts
      <> progDesc "Generate Latex kanji flashcards for all kanjis in file FILENAME"
      <> header "一右二烏 - a Kanji flashcards generation tool" ) 
 
-generateFlashcards (Params debug input lang kanjidic jmdic freqlist) = do
+generateFlashcards (Params debug input lang kanjidic jmdic freqlist noDictFilling) = do
   codepoints <- fmap (mkUniq . filter isCJK) $ readFile input
   rawKanjis <- kanjis (pack lang) kanjidic
   loadRadical <- loadRadicalData "resources/radicals_haskelled" "resources/kradfile-u_haskelled"
   loadSimilar <- loadSimilarKanjis rawKanjis "resources/jyouyou__strokeEditDistance.csv"
-  loadCompound <- loadCompounds freqlist jmdic
+  loadCompound <- loadCompounds noDictFilling freqlist jmdic
 
   let kanjis = fmap (loadCompound . loadSimilar . loadRadical) rawKanjis
 
   let relevants = filter (\k -> elem (char k) codepoints) kanjis
   let count = length relevants
---  print relevants
   
   texContent <- generateTex debug relevants
   hPutStrLn stdout texContent

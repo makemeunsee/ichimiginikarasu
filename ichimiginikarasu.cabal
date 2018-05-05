@@ -24,6 +24,7 @@ library
                      , hexpat
                      , bytestring
                      , text
+                     , containers
   default-language:    Haskell2010
 
 executable ichimiginikarasu-exe
