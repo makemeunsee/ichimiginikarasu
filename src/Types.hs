@@ -13,5 +13,5 @@ data Radical = Radical { r_number :: Int, r_char :: Char, r_strokes :: Int, r_me
 data Kanji = Kanji { char :: Char, codepoint :: Text, radical :: Radical, strokes :: Int, onReadings :: [Text], kunReadings :: [Text], meanings :: [Text], similars :: [(Char, Text)], compounds :: [Compound] }
   deriving ( Show, Eq )
 
-data Compound = Compound { uid :: Int, kanjide :: Text, reading :: Text, translation :: Text }
+data Compound = Compound { uid :: Int, kanjide :: Text, reading :: Text, translations :: [Text] }
   deriving ( Show, Eq )

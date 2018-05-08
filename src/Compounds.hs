@@ -46,18 +46,18 @@ toCompounds lang node = fmap (\k -> (k, toCompound lang k node)) kebs
   where
     kebs = fmap unsafeText $ filterDeepNodes ["k_ele", "keb"] node
 
-toCompound lang keb node = Compound uid keb reading translation
+toCompound lang keb node = Compound uid keb reading translations
   where
     uid = read $ T.unpack $ unsafeText $ head $ filterDeepNodes ["ent_seq"] node
     reading = unsafeText $ head $ filterDeepNodes ["r_ele", "reb"] node
-    translation = head $ catMaybes $ fmap (toSense lang) $ filterDeepNodes ["sense"] node
+    translations = head $ catMaybes $ fmap (toSense lang) $ filterDeepNodes ["sense"] node
 
 langFilter "en" = attrFilter "xml:lang" "eng"
 langFilter str = attrFilter "xml:lang" str
 
-toSense :: Text -> NodeG [] Text Text -> Maybe Text
+toSense :: Text -> NodeG [] Text Text -> Maybe [Text]
 toSense lang node
   | glosss == [] = Nothing
-  | otherwise = Just $ T.intercalate ", " $ fmap unsafeText glosss
+  | otherwise = Just $ fmap unsafeText glosss
   where
     glosss = filter (langFilter lang) $ filterDeepNodes ["gloss"] node

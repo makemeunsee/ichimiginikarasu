@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Kanjidic (kanjis) where
+module Kanjidic (kanjis, jlptKanjis) where
 
 import qualified Data.Text.IO as TIO
 import qualified Data.Text as T
@@ -28,7 +28,24 @@ kanjis lang path = do
       TIO.hPutStrLn stderr $ "XML parse failed: " `append` (pack $ show err)
       return []
 
-loadKanji lang charNode = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = [('¤',"???")], compounds = [ Compound 0 "???" "???" "???" ] }
+jlptKanjis :: Int -> FilePath -> IO [Char]
+jlptKanjis level path = do
+  kanjidicRaw <- L.readFile path
+  let (kanjidic, mErr) = parse defaultParseOptions kanjidicRaw :: (NodeG [] Text Text, Maybe XMLParseError)
+
+  let textJlpt = pack $ show level
+  let withJlpt = any ((==) textJlpt . unsafeText) . filterDeepNodes ["misc","jlpt"]
+  let charNodes = filter withJlpt $ filterDeepNodes ["character"] kanjidic
+
+  case mErr of
+    Nothing -> return $ fmap loadKanjiChar charNodes
+    Just err -> do
+      TIO.hPutStrLn stderr $ "XML parse failed: " `append` (pack $ show err)
+      return []
+
+loadKanjiChar = T.head . unsafeText . head . filterDeepNodes ["literal"]
+
+loadKanji lang charNode = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = [('¤',"???")], compounds = [ Compound 0 "???" "???" [] ] }
   where
     isUCS = attrFilter "cp_type" "ucs"
     cpValues = filterDeepNodes ["codepoint", "cp_value"] charNode

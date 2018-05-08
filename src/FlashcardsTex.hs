@@ -4,6 +4,7 @@ module FlashcardsTex (generateTex) where
 
 import Data.List (intersperse)
 import System.Process (system)
+import qualified Data.Text as T
 import Data.Text (Text,pack,unpack,append,intercalate,replace)
 import qualified Data.Text.IO as TIO
 
@@ -18,8 +19,7 @@ generateTex debug kanjis = do
   pdfTexs <- mapM pdfGen kanjis
 
   let footer = "%unique flashcards generated: " `append` (pack $ show count)
-  let filler 0 = ""
-  let filler f = foldr append "" $ replicate (10 - f) "\\begin{flashcard}{}\\end{flashcard}"
+  let filler f = if f == 0 then "" else foldr append "" $ replicate (10 - f) "\\begin{flashcard}{}\\end{flashcard}"
 
   let flashcards = foldr append "" $ fmap (uncurry $ insertKanji template_flashcard) $ zip kanjis pdfTexs
 
@@ -64,7 +64,7 @@ substitutions =
   , ("___MEANINGS___", printMeanings . meanings)
   , ("___BOXES_HEIGHT___", boxesHeight)
   , ("___SIMILAR_KANJIS___", similarSubst . similars)
-  , ("___COMPOUNDS___", withFixesOr "\\hspace{1pt}" compoundsPrefix compoundsSuffix . makeCompounds kanjide)
+  , ("___COMPOUNDS___", withFixesOr "\\hspace{1pt}" compoundsPrefix compoundsSuffix . makeCompounds (escapeTex . kanjide))
   , ("___COMPOUND_TRANSLATIONS___", withFixesOr "-" compoundsReadingPrefix compoundsReadingSuffix . makeCompounds readingAndTranslations)
   ]
 
@@ -79,9 +79,17 @@ compoundsReadingSuffix = "\n\\end{enumerate}%"
 withFixesOr text _ _ "" = text
 withFixesOr _ prefix suffix text = prefix `append` text `append` suffix
 
-readingAndTranslations compound = (reading compound) `append` " " `append` (translation compound)
+readingAndTranslations compound = (escapeTex $ reading compound) `append` "\\\\*\n" `append` (escapeTex $ intercalate ", " $ take 3 $ translations compound)
 
-makeCompounds which = intercalate "\n" . fmap (("      \\item " `append`) . escapeTex . which) . compounds
+makeCompounds which = intercalate "\n" . fmap (("\\item " `append`) . noParen . which) . compounds
+
+noParen :: Text -> Text
+noParen = replace " ," "," . fst . T.foldr noParen'("", 0)
+  where
+    noParen' '(' (text, count) = (text, count+1)
+    noParen' ')' (text, count) = (text, count-1)
+    noParen' c (text, 0) = (T.cons c text, 0)
+    noParen' _ (text, count) = (text, count)
 
 applySubstitution :: Kanji -> Text -> (Text, Kanji -> Text) -> Text
 applySubstitution kanji string (toReplace, extractor) = replace toReplace (extractor kanji) string

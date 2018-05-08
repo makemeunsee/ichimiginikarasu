@@ -43,7 +43,8 @@ ___KAKIKATA2___
 
 %front end
 }
-\centering
+\vspace*{\fill}%
+\centering%
 \setbox0=\hbox{%
 \fcolorbox{red}{yellow}{%
 \parbox{0.95\cardinnerwidth}{%
@@ -52,12 +53,12 @@ ___KAKIKATA2___
 \fontsize{8}{9}\selectfont
 ___ON_READINGS___%
 ___KUN_READINGS___%
-___MEANINGS___ \\[5pt]
-\hspace*{\fill}\rule[7pt]{0.5\cardinnerwidth}{0.5pt}\hspace*{\fill}
-\begin{multicols*}{2}[]%
+___MEANINGS___ \\[10pt]
+\hspace*{\fill}\rule[12pt]{0.5\cardinnerwidth}{0.5pt}\hspace*{\fill}
+\begin{multicols}{2}[]%
 %up to 6 compound meanings like '    \item [hiragana] [translation]'
 ___COMPOUND_TRANSLATIONS___
-\end{multicols*}%
+\end{multicols}%
 }%
 }%
 }%
@@ -68,5 +69,6 @@ ___COMPOUND_TRANSLATIONS___
 }{
 \box0
 }
+\vspace*{\fill}%
 \end{flashcard}
 
