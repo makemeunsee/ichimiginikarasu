@@ -65,7 +65,7 @@ substitutions =
   , ("___BOXES_HEIGHT___", boxesHeight)
   , ("___SIMILAR_KANJIS___", similarSubst . similars)
   , ("___COMPOUNDS___", withFixesOr "\\hspace{1pt}" compoundsPrefix compoundsSuffix . makeCompounds kanjide)
-  , ("___COMPOUND_TRANSLATIONS___", withFixesOr "-" compoundsReadingPrefix compoundsReadingSuffix . makeCompounds reading)
+  , ("___COMPOUND_TRANSLATIONS___", withFixesOr "-" compoundsReadingPrefix compoundsReadingSuffix . makeCompounds readingAndTranslations)
   ]
 
 compoundsPrefix = "    \\begin{enumerate}[leftmargin=20pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\\normalfont\\normalsize]\n"
@@ -78,6 +78,8 @@ compoundsReadingSuffix = "\n\\end{enumerate}%"
 
 withFixesOr text _ _ "" = text
 withFixesOr _ prefix suffix text = prefix `append` text `append` suffix
+
+readingAndTranslations compound = (reading compound) `append` " " `append` (translation compound)
 
 makeCompounds which = intercalate "\n" . fmap (("      \\item " `append`) . escapeTex . which) . compounds
 
@@ -106,7 +108,7 @@ kakikata1 pdfTexFilename kanji
 kakikata2 pdfTexFilename kanji
   | stks > 12 = ""
   | otherwise = "  \\\\%\n \
-\ \\centering \\parbox[c][0.2\\cardheight][c]{" `append` svgWidth `append` "\\cardinnerwidth}{%\n \
+\ \\centering \\parbox[c][0.2\\cardinnerheight][c]{" `append` svgWidth `append` "\\cardinnerwidth}{%\n \
 \   \\def\\svgwidth{" `append` svgWidth `append` "\\cardinnerwidth}\n \
 \   \\input{" `append` pdfTexFilename `append` ".pdf_tex}\n \
 \ }%"

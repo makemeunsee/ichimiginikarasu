@@ -44,22 +44,23 @@ ___KAKIKATA2___
 %front end
 }
 \centering
-\setbox0=\hbox{
-\parbox{0.95\cardinnerwidth}{
-\vspace{5pt}
-\setstretch{0.8}
-\fontsize{10}{10}\selectfont
+\setbox0=\hbox{%
+\fcolorbox{red}{yellow}{%
+\parbox{0.95\cardinnerwidth}{%
+\vspace{5pt}%
+\setstretch{0.8}%
+\fontsize{8}{9}\selectfont
 ___ON_READINGS___%
 ___KUN_READINGS___%
-\fontsize{10}{12}\selectfont ___MEANINGS___ \\[-3pt]
-\rule[1pt]{0.95\cardinnerwidth}{0.5pt}
-\begin{multicols}{2}[]%
-\fontsize{10}{12}\selectfont
+___MEANINGS___ \\[5pt]
+\hspace*{\fill}\rule[7pt]{0.5\cardinnerwidth}{0.5pt}\hspace*{\fill}
+\begin{multicols*}{2}[]%
 %up to 6 compound meanings like '    \item [hiragana] [translation]'
 ___COMPOUND_TRANSLATIONS___
-\end{multicols}%
-}
-}
+\end{multicols*}%
+}%
+}%
+}%
 \myheight=\ht0 \advance\myheight by \dp0
 \ifthenelse{\myheight > \cardinnerheight}{
 \GenericWarning{}{error, content too big, \the\myheight, max: \the\cardinnerheight}

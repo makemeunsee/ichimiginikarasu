@@ -83,7 +83,7 @@ generateFlashcards (Params debug input lang kanjidic jmdic freqlist noDictFillin
   rawKanjis <- kanjis (pack lang) kanjidic
   loadRadical <- loadRadicalData "resources/radicals_haskelled" "resources/kradfile-u_haskelled"
   loadSimilar <- loadSimilarKanjis rawKanjis "resources/jyouyou__strokeEditDistance.csv"
-  loadCompound <- loadCompounds noDictFilling freqlist jmdic
+  loadCompound <- loadCompounds noDictFilling (pack lang) freqlist jmdic
 
   let kanjis = fmap (loadCompound . loadSimilar . loadRadical) rawKanjis
 
