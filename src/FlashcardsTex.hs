@@ -101,7 +101,7 @@ insertFlashcards string cards = replace "___FLASHCARDS___" cards string
 
 boxesHeight kanji
   | stks > 12 = ""
-  | otherwise = "0.77"
+  | otherwise = "0.87"
   where
     stks = strokes kanji
 
@@ -116,13 +116,13 @@ kakikata1 pdfTexFilename kanji
 kakikata2 pdfTexFilename kanji
   | stks > 12 = ""
   | otherwise = "  \\\\%\n \
-\ \\parbox[c][0.2\\cardinnerheight][c]{" `append` svgWidth `append` "\\cardinnerwidth}{%\n \
+\ \\parbox[c][0.08125\\cardinnerheight][c]{" `append` svgWidth `append` "\\cardinnerwidth}{%\n \
 \   \\def\\svgwidth{" `append` svgWidth `append` "\\cardinnerwidth}\n \
 \   \\input{" `append` pdfTexFilename `append` ".pdf_tex}\n \
 \ }%"
   where
     stks = strokes kanji
-    svgWidth = pack $ show $ min 0.975 $ fromIntegral stks * 0.135
+    svgWidth = pack $ show $ fromIntegral stks * 0.08125
 
 similarSubst sims = "    \\begin{TAB}(e,1cm,1cm){|c|}{|" `append` pattern `append` "|}\n" `append` boxes `append` "    \\end{TAB}%"
   where
