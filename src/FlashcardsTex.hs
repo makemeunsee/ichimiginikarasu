@@ -116,7 +116,7 @@ kakikata1 pdfTexFilename kanji
 kakikata2 pdfTexFilename kanji
   | stks > 12 = ""
   | otherwise = "  \\\\%\n \
-\ \\centering \\parbox[c][0.2\\cardinnerheight][c]{" `append` svgWidth `append` "\\cardinnerwidth}{%\n \
+\ \\parbox[c][0.2\\cardinnerheight][c]{" `append` svgWidth `append` "\\cardinnerwidth}{%\n \
 \   \\def\\svgwidth{" `append` svgWidth `append` "\\cardinnerwidth}\n \
 \   \\input{" `append` pdfTexFilename `append` ".pdf_tex}\n \
 \ }%"
