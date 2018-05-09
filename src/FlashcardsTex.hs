@@ -10,8 +10,8 @@ import qualified Data.Text.IO as TIO
 
 import Types
 
-generateTex :: Bool -> [Kanji] -> IO Text
-generateTex debug kanjis = do
+generateTex :: Bool -> Text -> [Kanji] -> IO Text
+generateTex debug deck kanjis = do
   let count = length kanjis
   template <- TIO.readFile "resources/template.tex"
   template_flashcard <- TIO.readFile $ flashcardTemplate debug 
@@ -21,7 +21,7 @@ generateTex debug kanjis = do
   let footer = "%unique flashcards generated: " `append` (pack $ show count)
   let filler f = if f == 0 then "" else foldr append "" $ replicate (10 - f) "\\begin{flashcard}{}\\end{flashcard}"
 
-  let flashcards = foldr append "" $ fmap (uncurry $ insertKanji template_flashcard) $ zip kanjis pdfTexs
+  let flashcards = foldr append "" $ fmap (replace "___DECK___" deck . (uncurry $ insertKanji template_flashcard)) $ zip kanjis pdfTexs
 
   return $ insertFlashcards template $ flashcards `append` "\n" `append` (filler $ count `mod` 10) `append` "\n" `append` footer
 
@@ -101,7 +101,7 @@ insertFlashcards string cards = replace "___FLASHCARDS___" cards string
 
 boxesHeight kanji
   | stks > 12 = ""
-  | otherwise = "0.77"
+  | otherwise = "0.87"
   where
     stks = strokes kanji
 
@@ -116,13 +116,13 @@ kakikata1 pdfTexFilename kanji
 kakikata2 pdfTexFilename kanji
   | stks > 12 = ""
   | otherwise = "  \\\\%\n \
-\ \\centering \\parbox[c][0.2\\cardinnerheight][c]{" `append` svgWidth `append` "\\cardinnerwidth}{%\n \
+\ \\centering \\parbox[c][0.08125\\cardinnerheight][c]{" `append` svgWidth `append` "\\cardinnerwidth}{%\n \
 \   \\def\\svgwidth{" `append` svgWidth `append` "\\cardinnerwidth}\n \
 \   \\input{" `append` pdfTexFilename `append` ".pdf_tex}\n \
 \ }%"
   where
     stks = strokes kanji
-    svgWidth = pack $ show $ min 0.975 $ fromIntegral stks * 0.135
+    svgWidth = pack $ show $ fromIntegral stks * 0.08125
 
 similarSubst sims = "    \\begin{TAB}(e,1cm,1cm){|c|}{|" `append` pattern `append` "|}\n" `append` boxes `append` "    \\end{TAB}%"
   where

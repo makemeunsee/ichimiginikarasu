@@ -1,8 +1,15 @@
 \begin{flashcard}{
-%
 \setlength{\heightlimit}{___BOXES_HEIGHT___\cardinnerheight}%
 %
-\parbox{\cardinnerwidth}{%
+% \parbox[c][0pt][c]{0pt}{%
+% \begin{rotate}{90}%
+% \parbox[t][1.5\height][b]{0.8\cardinnerheight}{%
+%   \hspace{20pt}\fontsize{6}{6}\selectfont demo
+% }%
+% \end{rotate}%
+% }%
+%
+\parbox[b]{\cardinnerwidth}{%
   \parbox[t][___BOXES_HEIGHT___\cardinnerheight][c]{0.4\cardinnerwidth}{%
     \centering
     \fontsize{80}{80}\selectfont ___KANJI___ \\[4pt]
@@ -28,7 +35,7 @@ ___COMPOUNDS___
     \centering
 ___SIMILAR_KANJIS___
   }%
-%drawing diagram, if stroke count < 12
+  %drawing diagram, if stroke count < 12
 ___KAKIKATA2___
 
 }%

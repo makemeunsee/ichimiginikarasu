@@ -23,6 +23,7 @@ mkUniq = toList . fromList
 data Params = Params
   { debug :: Bool
   , inputFile :: FilePath
+  , deck :: String 
   , lang :: String 
   , kanjidicPath :: FilePath
   , jmdicPath :: FilePath
@@ -41,6 +42,12 @@ params = Params
     <> short 'i'
     <> metavar "FILENAME"
     <> help "text file containing the kanjis of which to create flashcards" )
+  <*> strOption
+     ( long "deck"
+    <> short 'n'
+    <> showDefault
+    <> value ""
+    <> help "the name of the card deck to generate" )
   <*> strOption
      ( long "lang"
     <> short 'l'
@@ -78,7 +85,7 @@ main = generateFlashcards =<< execParser opts
      <> progDesc "Generate Latex kanji flashcards for all kanjis in file FILENAME"
      <> header "一右二烏 - a Kanji flashcards generation tool" ) 
 
-generateFlashcards (Params debug input lang kanjidic jmdic freqlist noDictFilling) = do
+generateFlashcards (Params debug input deck lang kanjidic jmdic freqlist noDictFilling) = do
   codepoints <- fmap (mkUniq . filter isCJK) $ readFile input
   rawKanjis <- kanjis (pack lang) kanjidic
   loadRadical <- loadRadicalData "resources/radicals_haskelled" "resources/kradfile-u_haskelled"
@@ -90,5 +97,5 @@ generateFlashcards (Params debug input lang kanjidic jmdic freqlist noDictFillin
   let relevants = filter (\k -> elem (char k) codepoints) kanjis
   let count = length relevants
   
-  texContent <- generateTex debug relevants
+  texContent <- generateTex debug (pack deck) relevants
   hPutStrLn stdout texContent
