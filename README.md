@@ -6,9 +6,19 @@ This is a tool to generate printable kanji flashcards, because the free existing
 
  - Good looking (design was inspired by White Rabbit flashcards)
  - Automatically generated
- - Multilingual. This is still work in progress / postponed.
+ 
+ Multilingual support was an early goal, but the current state of dictionaries for language other than English makes it less promising. Hence this is currently postponed.
 
 ## Example
+
+### Generated decks
+
+- https://github.com/makemeunsee/ichimiginikarasu/blob/master/examples/jlpt4.pdf
+- https://github.com/makemeunsee/ichimiginikarasu/blob/master/examples/jlpt3.pdf
+- https://github.com/makemeunsee/ichimiginikarasu/blob/master/examples/jlpt2.pdf
+- https://github.com/makemeunsee/ichimiginikarasu/blob/master/examples/jlpt1.pdf
+
+### Samples
 
 ![Flashcard sample](https://github.com/makemeunsee/ichimiginikarasu/blob/master/example.png)
 
