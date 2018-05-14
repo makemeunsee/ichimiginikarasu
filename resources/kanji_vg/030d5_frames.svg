@@ -1,0 +1,11 @@
+<!-- 030d5 -->
+<svg width="109px" height="109px" viewBox="0 0 109px 109px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" version="1.1"  baseProfile="full">
+<line x1="1" y1="1" x2="108" y2="1" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="1" x2="1" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="108" x2="108" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="108" y1="1" x2="108" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="54" x2="108" y2="54" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="55" y1="1" x2="55" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<path d="M24.5,30c1.88,1.88,3.5,2.04,6.5,1.62c14.5-2,29-4.38,43.75-6.88c6.82-1.16,10.58,2.29,6.88,9.12c-10.38,19.14-21.25,39.52-50.01,53.64" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="24.5" cy="30.0" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+</svg>

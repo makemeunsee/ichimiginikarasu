@@ -1,0 +1,11 @@
+<!-- 030d8 -->
+<svg width="109px" height="109px" viewBox="0 0 109px 109px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" version="1.1"  baseProfile="full">
+<line x1="1" y1="1" x2="108" y2="1" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="1" x2="1" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="108" x2="108" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="108" y1="1" x2="108" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="54" x2="108" y2="54" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="55" y1="1" x2="55" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<path d="M15.5,49.02c2.78,1.55,5.39,0.64,6.95-0.9c4.05-4.01,9.47-8.3,12-10.88c3.16-3.23,7.32-5.26,12.01-1.16c11.25,9.82,25.03,21.45,35.78,30.36c4.28,3.55,7.71,6.85,11.25,9.56" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="15.5" cy="49.02" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+</svg>

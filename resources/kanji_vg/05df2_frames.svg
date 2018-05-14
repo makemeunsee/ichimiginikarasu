@@ -1,0 +1,22 @@
+<!-- 05df2 -->
+<svg width="327px" height="109px" viewBox="0 0 327px 109px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" version="1.1"  baseProfile="full">
+<line x1="1" y1="1" x2="326" y2="1" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="1" x2="1" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="108" x2="326" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="326" y1="1" x2="326" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="109" y1="1" x2="109" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="218" y1="1" x2="218" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="54" x2="326" y2="54" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="55" y1="1" x2="55" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="164" y1="1" x2="164" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="273" y1="1" x2="273" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<path d="M25.75,19.89c2.38,1.39,4.42,1.39,7.92,0.93c7.1-0.93,38.05-4.15,40.22-4.33c2.86-0.23,5.11,1.52,4.09,5.1c-0.3,1.07-2.73,12.42-4.73,22.67" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="25.75" cy="19.89" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+<path d="M134.75,19.89c2.38,1.39,4.42,1.39,7.92,0.93c7.1-0.93,38.05-4.15,40.22-4.33c2.86-0.23,5.11,1.52,4.09,5.1c-0.3,1.07-2.73,12.42-4.73,22.67" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M139.25,48.75c5.25-0.5,30-2.5,45.5-4.5" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="139.25" cy="48.75" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+<path d="M243.75,19.89c2.38,1.39,4.42,1.39,7.92,0.93c7.1-0.93,38.05-4.15,40.22-4.33c2.86-0.23,5.11,1.52,4.09,5.1c-0.3,1.07-2.73,12.42-4.73,22.67" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M248.25,48.75c5.25-0.5,30-2.5,45.5-4.5" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M246.74,34.87c1.16,1.69,1.67,3.68,1.65,6.28c-0.04,7.6-0.28,23.71-0.28,30.6C248.11,93.25 251.1,92 279.94,92C311.06,92 309.0,85.5 309.0,76.75" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="246.74" cy="34.87" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+</svg>

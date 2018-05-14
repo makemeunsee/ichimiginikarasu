@@ -1,0 +1,22 @@
+<!-- 051e1 -->
+<svg width="327px" height="109px" viewBox="0 0 327px 109px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" version="1.1"  baseProfile="full">
+<line x1="1" y1="1" x2="326" y2="1" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="1" x2="1" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="108" x2="326" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="326" y1="1" x2="326" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="109" y1="1" x2="109" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="218" y1="1" x2="218" y2="108" style="stroke:#ddd;stroke-width:2" />
+<line x1="1" y1="54" x2="326" y2="54" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="55" y1="1" x2="55" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="164" y1="1" x2="164" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<line x1="273" y1="1" x2="273" y2="108" style="stroke:#ddd;stroke-width:2;stroke-dasharray:3 3" />
+<path d="M35.55,21.25c1.04,1.04,1.5,2.38,1.57,4.74C37.75,48 38.0,78.5 17.25,92.5" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="35.55" cy="21.25" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+<path d="M144.55,21.25c1.04,1.04,1.5,2.38,1.57,4.74C146.75,48 147.0,78.5 126.25,92.5" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M147.25,23.75C151.0,23 169.5,19.5 172.5,18.75s5.85,0.69,5.5,4.5c-1.75,19.25-2.5,36-2.5,52c0,13.02,2.75,15,14.25,15c12,0,13.5-1.5,13.5-10.5" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="147.25" cy="23.75" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+<path d="M253.55,21.25c1.04,1.04,1.5,2.38,1.57,4.74C255.75,48 256.0,78.5 235.25,92.5" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M256.25,23.75C260.0,23 278.5,19.5 281.5,18.75s5.85,0.69,5.5,4.5c-1.75,19.25-2.5,36-2.5,52c0,13.02,2.75,15,14.25,15c12,0,13.5-1.5,13.5-10.5" style="fill:none;stroke:#999;stroke-width:3" />
+<path d="M264.0,48c5.58,4.67,8.77,9.62,10.5,14" style="fill:none;stroke:black;stroke-width:3" />
+<circle cx="264.0" cy="48.0" r="5" stroke-width="0" fill="#FF2A00" opacity="0.7" />
+</svg>

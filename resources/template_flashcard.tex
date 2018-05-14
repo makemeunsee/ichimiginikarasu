@@ -1,0 +1,65 @@
+\begin{flashcard}{
+\setlength{\heightlimit}{___BOXES_HEIGHT___\cardinnerheight}%
+\parbox[b]{\cardinnerwidth}{%
+  \parbox{0.4\cardinnerwidth}{%
+    \centering
+    \fontsize{80}{80}\selectfont ___KANJI___ \\[4pt]
+    \fontsize{12}{14}\selectfont ___RADICAL___ \\[2pt]
+  }%
+  \setbox0=\hbox{%
+  \parbox{0.4\cardinnerwidth}{%
+    \fontsize{10}{11}\selectfont
+    %up to 6 compounds like '      \item ...'
+___COMPOUNDS___
+  }%
+  }%
+  \myheight=\ht0 \advance\myheight by \dp0%
+  \ifthenelse{\myheight > \heightlimit}{%
+  \GenericWarning{}{error, content too big, \the\myheight, max: \the\heightlimit}%
+  \box0%
+  }{%
+  \box0%
+  }%
+  \parbox[c][0.87\cardinnerheight][c]{0.18\cardinnerwidth}{%
+    \centering
+    \fontsize{6}{6}\selectfont ___DECK___\\[5pt]	
+___SIMILAR_KANJIS___
+  }%
+  \\%
+  \centering%
+___KAKIKATA___
+}%
+
+%front end
+}
+\centering%
+\setbox0=\hbox{%
+\parbox{0.95\cardinnerwidth}{%
+  \vspace{5pt}%
+  \setstretch{0.8}%
+  \fontsize{9}{10}\selectfont%
+  ___ON_READINGS___%
+  ___KUN_READINGS___%
+  ___MEANINGS___\\%
+  \vspace*{\fill}\\[0pt]%
+  \hspace*{\fill}\rule[0pt]{0.2\cardinnerwidth}{0.5pt}\hspace*{\fill}%
+  ___RADICAL___ : ___RADICAL_MEANING___%
+  \hspace*{\fill}\rule[0pt]{0.2\cardinnerwidth}{0.5pt}\hspace*{\fill}\\[0pt]%
+  \vspace*{\fill}%
+  \fontsize{8}{9}\selectfont%
+  \begin{multicols}{2}[]%
+    %up to 6 compound meanings like '    \item [hiragana] [translation]'
+    ___COMPOUND_TRANSLATIONS___
+  \end{multicols}%
+  \vspace*{\fill}%
+}%
+}%
+\myheight=\ht0 \advance\myheight by \dp0
+\ifthenelse{\myheight > \cardinnerheight}{
+\GenericWarning{}{error, content too big, \the\myheight, max: \the\cardinnerheight}
+\box0
+}{
+\box0
+}
+\end{flashcard}
+
