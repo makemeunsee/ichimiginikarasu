@@ -6,9 +6,13 @@ This is a tool to generate printable kanji flashcards, because the free existing
 
  - Good looking (design was inspired by White Rabbit flashcards)
  - Automatically generated
- - Multilingual. This is not work in progress / postponed.
+ - Multilingual. This is still work in progress / postponed.
 
 ## Example
+
+![Flashcard sample](https://github.com/makemeunsee/ichimiginikarasu/blob/master/example.png)
+
+![Annotated flashcard sample](https://github.com/makemeunsee/ichimiginikarasu/blob/master/example_explained.png)
 
 ## Requirements
 
@@ -44,7 +48,7 @@ Grepping 'error' from the latex compilation can help identify potential typesett
 
 - The issues file list kanji that are rendered somewhat off
 - tex & pdf files are generated during the execution in the 'resources/kanji_vg directory' and are not cleaned
-- Some interesting compounds readings and translations are missing, as no good strategy was found to select them. E.g.: 空's reading 'そら - sky' is missing, whereas 'から - empty' is.
+- Some interesting compounds readings and translations are missing, as no good strategy was found to select them. E.g.: 空's reading 'そら - sky' is missing, whereas 'から - empty' is present.
 
 ## Acknowledgements
 
@@ -55,6 +59,7 @@ Lots of existing resources were necessary to create this tool and flashcards. In
 - The kradfile, JMdict, kanjidic2 by the Electronic Dictionary Research & Development Group at Monash university
 - The Kelly & Girardi Japanese words frequency list
 - The kanji similarity matrix, by Lars Jensen
+
 See the LICENSE file for details, and these sites for similar resources: http://ftp.monash.edu.au/pub/nihongo/00INDEX.html, http://lars.yencken.org/datasets/phd/
 
 ## Future features
