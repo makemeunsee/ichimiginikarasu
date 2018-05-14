@@ -13,10 +13,10 @@ This is a tool to generate printable kanji flashcards, because the free existing
 
 ### Generated decks
 
-- https://github.com/makemeunsee/ichimiginikarasu/blob/master/examples/jlpt4.pdf
-- https://github.com/makemeunsee/ichimiginikarasu/blob/master/examples/jlpt3.pdf
-- https://github.com/makemeunsee/ichimiginikarasu/blob/master/examples/jlpt2.pdf
-- https://github.com/makemeunsee/ichimiginikarasu/blob/master/examples/jlpt1.pdf
+- https://github.com/makemeunsee/ichimiginikarasu/raw/master/examples/jlpt4.pdf
+- https://github.com/makemeunsee/ichimiginikarasu/raw/master/examples/jlpt3.pdf
+- https://github.com/makemeunsee/ichimiginikarasu/raw/master/examples/jlpt2.pdf
+- https://github.com/makemeunsee/ichimiginikarasu/raw/master/examples/jlpt1.pdf
 
 ### Samples
 
@@ -56,7 +56,7 @@ Grepping 'error' from the latex compilation can help identify potential typesett
 
 ## Issues
 
-- The issues file list kanji that are rendered somewhat off
+- The [issues](https://github.com/makemeunsee/ichimiginikarasu/blob/master/issues) file lists kanjis that are rendered somewhat off
 - tex & pdf files are generated during the execution in the 'resources/kanji_vg directory' and are not cleaned
 - Some interesting compounds readings and translations are missing, as no good strategy was found to select them. E.g.: 空's reading 'そら - sky' is missing, whereas 'から - empty' is present.
 
