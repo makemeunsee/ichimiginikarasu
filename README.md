@@ -2,12 +2,12 @@
 
 ## Purpose
 
-This is a tool to generate printable kanji flashcards, because the free existing sets I found where not satisfying to me. The goal is to have the flashcards:
+This is a tool to generate printable kanji flashcards, because the free existing sets I found were not satisfying to me. The goal is to have the flashcards:
 
  - Good looking (design was inspired by White Rabbit flashcards)
  - Automatically generated
  
- Multilingual support was an early goal, but the current state of dictionaries for language other than English makes it less promising. Hence this is currently postponed.
+Multilingual support was an early goal, but the current state of dictionaries for language other than English makes it less promising. Hence this is currently postponed.
 
 ## Example
 
@@ -42,6 +42,10 @@ This is a tool to generate printable kanji flashcards, because the free existing
 
 > stack exec ichimiginikarasu-exe -- -f resources/jpn_words_girardi_kelly -j resources/JMdict -k resources/kanjidic2.xml -n mydeck -i inputfile > mydeck.tex
 
+where 'inputfile' is the text file to get kanjis from, and 'mydeck' is the name of the deck (appears top right of the flashcards front).
+
+Other parameters can be changed to load custom resources.
+
 ### Generate .pdf from .tex
 
 > xelatex mydeck.tex
@@ -65,7 +69,7 @@ Grepping 'error' from the latex compilation can help identify potential typesett
 Lots of existing resources were necessary to create this tool and flashcards. In no particular order:
 
 - The kanji stroke diagrams by Ulrich Apel
-- The kanji stroke diagrams converter by Kim Ahlström of jisho.org
+- The kanji stroke diagrams converter by Kim Ahlström of [jisho.org](http://jisho.org)
 - The kradfile, JMdict, kanjidic2 by the Electronic Dictionary Research & Development Group at Monash university
 - The Kelly & Girardi Japanese words frequency list
 - The kanji similarity matrix, by Lars Jensen
