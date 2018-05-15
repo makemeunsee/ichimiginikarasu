@@ -72,9 +72,13 @@ Lots of existing resources were necessary to create this tool and flashcards. In
 - The kanji stroke diagrams converter by Kim Ahlström of [jisho.org](http://jisho.org)
 - The kradfile, JMdict, kanjidic2 by the Electronic Dictionary Research & Development Group at Monash university
 - The Kelly & Girardi Japanese words frequency list
-- The kanji similarity matrix, by Lars Jensen
+- The kanji similarity matrix, by Lars Yencken
 
-See the LICENSE file for details, and these sites for similar resources: http://ftp.monash.edu.au/pub/nihongo/00INDEX.html, http://lars.yencken.org/datasets/phd/
+See the LICENSE file for details, and these sites for similar resources:
+
+http://ftp.monash.edu.au/pub/nihongo/00INDEX.html
+
+http://lars.yencken.org/datasets/phd/
 
 ## Future features
 
