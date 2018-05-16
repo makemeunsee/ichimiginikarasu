@@ -13,8 +13,6 @@ import Text.XML.Expat.Tree
 import Types
 import XmlHelper
 
-import Debug.Trace
-
 kanjis :: Text -> FilePath -> IO [Kanji]
 kanjis lang path = do
   kanjidicRaw <- L.readFile path

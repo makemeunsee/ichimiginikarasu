@@ -14,8 +14,6 @@ import Data.Maybe (catMaybes, Maybe(Just))
 import Types
 import XmlHelper
 
-import Debug.Trace
-
 loadCompounds :: Bool -> Text -> FilePath -> FilePath -> IO (Kanji -> Kanji)
 loadCompounds noDictFilling lang freqListPath jmdicPath = do
   jmdicRaw <- L.readFile jmdicPath
@@ -42,18 +40,22 @@ selectFirst c0@(Compound uid0 _ _ _) c1@(Compound uid1 _ _ _)
   | uid0 < uid1 = c0
   | otherwise = c1
 
-toCompounds lang node = fmap (\k -> (k, toCompound lang k node)) kebs
+toCompounds :: Text -> NodeG [] Text Text -> [(Text, Compound)]
+toCompounds lang node = catMaybes $ fmap (\k -> toCompound lang k node) kebs
   where
     kebs = fmap unsafeText $ filterDeepNodes ["k_ele", "keb"] node
 
-toCompound lang keb node = Compound uid keb reading translations
+toCompound :: Text -> Text -> NodeG [] Text Text -> Maybe (Text, Compound)
+toCompound lang keb node
+  | translations == [] = Nothing
+  | otherwise = Just $ (keb, Compound uid keb reading $ head translations)
   where
     uid = read $ T.unpack $ unsafeText $ head $ filterDeepNodes ["ent_seq"] node
     reading = unsafeText $ head $ filterDeepNodes ["r_ele", "reb"] node
-    translations = head $ catMaybes $ fmap (toSense lang) $ filterDeepNodes ["sense"] node
+    translations = catMaybes $ fmap (toSense lang) $ filterDeepNodes ["sense"] node
 
-langFilter "en" = attrFilter "xml:lang" "eng"
-langFilter str = attrFilter "xml:lang" str
+langFilter "fr" = attrFilter "xml:lang" "fre"
+langFilter _ = attrFilter "xml:lang" "eng"
 
 toSense :: Text -> NodeG [] Text Text -> Maybe [Text]
 toSense lang node

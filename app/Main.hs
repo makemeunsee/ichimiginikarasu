@@ -53,7 +53,7 @@ params = Params
     <> short 'l'
     <> showDefault
     <> value "en"
-    <> help "the language used in translations" )
+    <> help "the language used in translations. Supported: 'en', 'fr', other values fallback to 'en'" )
   <*> strOption
      ( long "kanjidic"
     <> short 'k'
@@ -83,12 +83,16 @@ main = generateFlashcards =<< execParser opts
     opts = info (params <**> helper)
       ( fullDesc
      <> progDesc "Generate Latex kanji flashcards for all kanjis in file FILENAME"
-     <> header "一右二烏 - a Kanji flashcards generation tool" ) 
+     <> header "一右二烏 - a Kanji flashcards generation tool")
+
+radicalFilePath lang
+  | lang == "fr" = "resources/radicals_haskelled_fr"
+  | otherwise = "resources/radicals_haskelled"
 
 generateFlashcards (Params debug input deck lang kanjidic jmdic freqlist noDictFilling) = do
   codepoints <- fmap (mkUniq . filter isCJK) $ readFile input
   rawKanjis <- kanjis (pack lang) kanjidic
-  loadRadical <- loadRadicalData "resources/radicals_haskelled" "resources/kradfile-u_haskelled"
+  loadRadical <- loadRadicalData (radicalFilePath lang) "resources/kradfile-u_haskelled"
   loadSimilar <- loadSimilarKanjis rawKanjis "resources/jyouyou__strokeEditDistance.csv"
   loadCompound <- loadCompounds noDictFilling (pack lang) freqlist jmdic
 

@@ -25,6 +25,3 @@ loadRadicalData' radicals krad kanji = kanji { radical = rad { r_char = realRad,
     (_, variants, meaning) = head $ filter (\(i,_,_) -> i == radNum) radicals
     (_,parts) = head $ filter ((== kanjiChar) . fst) krad
     (realRad, realCount) = maybe (head variants) id $ listToMaybe $ filter (\(k,_) -> elem k parts || k == kanjiChar) variants
-
-
-
