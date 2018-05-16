@@ -1,7 +1,5 @@
 .stack-work/
 resources/kanji_vg/*tex
 resources/kanji_vg/*pdf
-*.tex
-*.pdf
 *.log
 *.aux
