@@ -95,7 +95,9 @@ withFixesOr _ prefix suffix text = prefix `append` text `append` suffix
 
 readingAndTranslations compound = (escapeTex $ reading compound) `append` "\\\\*\n" `append` (escapeTex $ intercalate ", " $ takeUpTo50Chars $ translations compound)
 
-takeUpTo50Chars texts = first : somemore
+takeUpTo50Chars texts
+  | texts == [] = []
+  | otherwise = first : somemore
   where
     first = head texts
     withLengths = fmap (\t -> (t, T.length t)) texts
