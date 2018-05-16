@@ -7,16 +7,14 @@ This is a tool to generate printable kanji flashcards, because the free existing
  - Good looking (design was inspired by White Rabbit flashcards)
  - Automatically generated
  
-Multilingual support was an early goal, but the current state of dictionaries for language other than English makes it less promising. Hence this is currently postponed.
+Multilingual support was an early goal, but the current state of dictionaries for language other than English makes it less promising. French is supported, with results not on par with the English version (fewer compounds, more 'things bigger than their boxes' cases, etc.).
 
 ## Example
 
 ### Generated decks
 
-- https://github.com/makemeunsee/ichimiginikarasu/raw/master/examples/jlpt4.pdf
-- https://github.com/makemeunsee/ichimiginikarasu/raw/master/examples/jlpt3.pdf
-- https://github.com/makemeunsee/ichimiginikarasu/raw/master/examples/jlpt2.pdf
-- https://github.com/makemeunsee/ichimiginikarasu/raw/master/examples/jlpt1.pdf
+- https://github.com/makemeunsee/ichimiginikarasu/tree/results/examples/en
+- https://github.com/makemeunsee/ichimiginikarasu/tree/results/examples/fr
 
 ### Samples
 
@@ -82,6 +80,6 @@ http://lars.yencken.org/datasets/phd/
 
 ## Future features
 
-- Multi language
+- Multi language: the first, easy step to have a language supported is to provide a localized "radicals_haskelled".
 - Custom input (ie. kanji content specified in individual files, not loaded from dictionaries)
-
+- Web port? To allow non haskellers to use the tool...
