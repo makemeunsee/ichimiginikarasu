@@ -1,25 +1,27 @@
-module XmlHelper (children, filterDeepNodes, unsafeText, attrFilter, noAttrFilter) where
+module XmlHelper (XmlNode, children, filterDeepNodes, unsafeText, attrFilter, noAttrFilter) where
 
 import Text.XML.Expat.Tree
 import Text.XML.Expat.Proc
 import Data.Text (Text)
 
-children :: Text -> NodeG [] Text Text -> [NodeG [] Text Text]
+type XmlNode = NodeG [] Text Text
+
+children :: Text -> XmlNode -> [XmlNode]
 children name node = filter ((== name) . getName) $ getChildren node
 
-filterDeepNodes :: [Text] -> NodeG [] Text Text -> [NodeG [] Text Text]
+filterDeepNodes :: [Text] -> XmlNode -> [XmlNode]
 filterDeepNodes names node = filterDeepNodes' names [node]
 
-filterDeepNodes' :: [Text] -> [NodeG [] Text Text] -> [NodeG [] Text Text]
+filterDeepNodes' :: [Text] -> [XmlNode] -> [XmlNode]
 filterDeepNodes' (name : names) nodes = filterDeepNodes' names $ concatMap (children name) nodes
 filterDeepNodes' _ nodes = nodes
 
-unsafeText :: NodeG [] Text Text -> Text
+unsafeText :: XmlNode -> Text
 unsafeText = getText . head . filter isText . getChildren 
 
-noAttrFilter :: Text -> NodeG [] Text Text -> Bool
+noAttrFilter :: Text -> XmlNode -> Bool
 noAttrFilter attrName = all ((/= attrName) . fst) . getAttributes
 
-attrFilter :: Text -> Text -> NodeG [] Text Text -> Bool
+attrFilter :: Text -> Text -> XmlNode -> Bool
 attrFilter attrName attrValue = any (== (attrName, attrValue)) . getAttributes
 

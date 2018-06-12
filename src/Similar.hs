@@ -18,5 +18,3 @@ loadSimilars kanjis similars kanji = kanji { similars = sims }
     sims = maybe [] (tail . fmap findMeaning) $ listToMaybe $ filter ((== kanjiChar) . head) similars
     kanjiChar = char kanji
     findMeaning c = (c, maybe "???" (head . meanings) $ find (\k -> char k == c) kanjis)
-
- 
