@@ -17,6 +17,8 @@ import Similar
 import Compounds
 import FlashcardsTex
 
+import Debug.Trace (traceShow, traceShowId)
+
 mkUniq :: Ord a => [a] -> [a]
 mkUniq = toList . fromList
 
@@ -28,6 +30,7 @@ data Params = Params
   , kanjidicPath :: FilePath
   , jmdicPath :: FilePath
   , wordsPath :: FilePath
+  , freqsPath :: FilePath
   , noDictFilling :: Bool
   }
 
@@ -67,15 +70,21 @@ params = Params
     <> value "resources/JMdict"
     <> help "the path to the JMdict XML file used to look up compounds pronunciation & translations" )
   <*> strOption
+     ( long "voclist"
+    <> short 'v'
+    <> showDefault
+    <> value "resources/jpn_words_KG_all.utf8"
+    <> help "the path to the text file (formatted like '乃公;だいこう') used to select compounds from" )
+  <*> strOption
      ( long "freqlist"
     <> short 'f'
     <> showDefault
-    <> value "resources/jpn_words"
-    <> help "the path to the text file (one word / line) used to select compounds from" )
+    <> value "resources/freq_list_Michiel_Kamermans.txt"
+    <> help "the path to the text file of compounds ordered by descending frequency" )
   <*> switch
      ( long "no-dict-fill"
     <> short 'n'
-    <> help "do not look for compounds in the dictionary if the frequency list gets exhausted" )
+    <> help "do not look for compounds in the dictionary if the vocabulary list gets exhausted" )
 
 main :: IO ()
 main = generateFlashcards =<< execParser opts
@@ -89,17 +98,19 @@ radicalFilePath lang
   | lang == "fr" = "resources/radicals_haskelled_fr"
   | otherwise = "resources/radicals_haskelled"
 
-generateFlashcards (Params debug input deck lang kanjidic jmdic freqlist noDictFilling) = do
-  codepoints <- fmap (mkUniq . filter isCJK) $ readFile input
-  rawKanjis <- kanjis (pack lang) kanjidic
-  loadRadical <- loadRadicalData (radicalFilePath lang) "resources/kradfile-u_haskelled"
-  loadSimilar <- loadSimilarKanjis rawKanjis "resources/jyouyou__strokeEditDistance.csv"
-  loadCompound <- loadCompounds noDictFilling (pack lang) freqlist jmdic
+generateFlashcards (Params debug input deck lang kanjidic jmdic vocList freqlist noDictFilling) = do
+  codepoints <- fmap (traceShow "read code points". mkUniq . filter isCJK) $ readFile input
+  rawKanjis <- fmap (traceShow "read kanjis") $ kanjis (pack lang) kanjidic
+  loadRadical <- fmap (traceShow "prepared radical func") $ loadRadicalData (radicalFilePath lang) "resources/kradfile-u_haskelled"
+  loadSimilar <- fmap (traceShow "prepared similarity func") $ loadSimilarKanjis rawKanjis "resources/jyouyou__strokeEditDistance.csv"
+  vocMap <- fmap (traceShow "prepared voc map") $ loadVocList vocList
+  jmdic <- fmap (traceShow "prepared compounds map") $ loadJmDic (pack lang) jmdic
+  freqMap <- fmap (traceShow "prepared freq map") $ loadFreqList freqlist
 
-  let kanjis = fmap (loadCompound . loadSimilar . loadRadical) rawKanjis
+  let kanjis = traceShow "loaded kanjis" $ fmap ((loadCompound jmdic vocMap freqMap) . loadSimilar . loadRadical) rawKanjis
 
-  let relevants = filter (\k -> elem (char k) codepoints) kanjis
-  let count = length relevants
-  
-  texContent <- generateTex debug (pack deck) relevants
+  let relevants = traceShow "filtered relevant kanjis" $ filter (\k -> elem (char k) codepoints) kanjis
+  let count = traceShowId $ length relevants
+
+  texContent <- fmap (traceShow "generated tex content") $ generateTex debug (pack deck) relevants
   hPutStrLn stdout texContent

@@ -67,9 +67,13 @@ substitutions =
   , ("___MEANINGS___", printMeanings . takeUpTo50Chars . meanings)
   , ("___BOXES_HEIGHT___", boxesHeight)
   , ("___SIMILAR_KANJIS___", similarSubst . similars)
-  , ("___COMPOUNDS___", withFixesOr "\\hspace{1pt}" compoundsPrefix compoundsSuffix . makeCompounds (escapeTex . kanjide))
+  , ("___COMPOUNDS___", withFixesOr "\\hspace{1pt}" compoundsPrefix compoundsSuffix . makeCompounds compoundWithPrio)
   , ("___COMPOUND_TRANSLATIONS___", withFixesOr "\\vspace*{\\fill}" compoundsReadingPrefix compoundsReadingSuffix . makeCompounds readingAndTranslations)
   ]
+
+compoundWithPrio c = t `append` "%" `append` (pack $ show $ prio c)
+  where
+    t = escapeTex $ kanjide c
 
 compoundsPrefix = "    \\begin{enumerate}[leftmargin=20pt,itemsep=1pt,parsep=2pt,topsep=2pt,partopsep=2pt,font=\\normalfont\\normalsize]\n"
 

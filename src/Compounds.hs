@@ -1,11 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Compounds (loadCompounds) where
+module Compounds (loadCompound, loadJmDic, loadVocList, loadFreqList) where
 
 import qualified Data.Text.IO as TIO
 import qualified Data.Text as T
-import Data.Text (Text, pack, append, toUpper)
+import Data.Text (Text, pack, append, toUpper, unpack)
 import Data.List (sortOn, sort)
 import GHC.IO.Handle.FD (stderr)
 import qualified Data.ByteString.Lazy as L
@@ -18,51 +18,102 @@ import Text.Read (readMaybe)
 import Types
 import XmlHelper
 
-loadCompounds :: Bool -> Text -> FilePath -> FilePath -> IO (Kanji -> Kanji)
-loadCompounds noDictFilling lang freqListPath jmdicPath = do
+import Debug.Trace (traceShowId, traceShow)
+
+loadCompound :: M.Map Kreb Compound -> M.Map Char [(Kreb, Int)] -> M.Map Text Int -> Kanji -> Kanji
+loadCompound jmdic vocMap freqMap kanji = kanji { compounds = compounds }
+  where
+    k = char kanji
+    krebs = fmap fst $ sortOn snd $ fmap (\(kreb, _) -> (kreb, M.findWithDefault 1000000 (keb kreb) freqMap)) $ M.findWithDefault [] k vocMap
+    compounds = take 6 $ catMaybes $ fmap (\kreb -> M.lookup kreb jmdic) krebs
+
+loadFreqList :: FilePath -> IO (M.Map Text Int)
+loadFreqList freqListPath = do
+  compounds <- fmap T.lines $ TIO.readFile freqListPath
+  return $ M.fromList $ zip compounds [0..]
+
+loadJmDic :: Text -> FilePath -> IO (M.Map Kreb Compound)
+loadJmDic lang jmdicPath = do
   jmdicRaw <- L.readFile jmdicPath
   let (jmdic, mErr) = parse defaultParseOptions jmdicRaw :: (XmlNode, Maybe XMLParseError)
+  let jmdicEntries = deepGetChildren ["entry"] jmdic
 
-  freqList <- fmap T.lines $ TIO.readFile freqListPath
-  let cmap = compoundsMap lang jmdic
-
-  let wordList = if noDictFilling then freqList else (freqList ++ M.keys cmap)
-
-  let compounds kanji = take 6 $ sortOn prio $ catMaybes $ fmap (\w -> M.lookup w cmap) $ filter (T.any (== char kanji)) $ wordList
-  let kanjiWithCompounds = \k -> k { compounds = compounds k }
-
+  let jmdic = M.fromList [(key, compound lang key priority entry) | entry <- jmdicEntries,
+                                                                    kele <- deepGetChildren ["k_ele"] entry,
+                                                                    rele <- deepGetChildren ["r_ele"] entry,
+                                                                    let (key, priority) = krebAndPrio kele rele,
+                                                                    priority < Bottom]
   case mErr of
-    Nothing -> return kanjiWithCompounds
+    Nothing -> return jmdic
     Just err -> do
-      TIO.hPutStrLn stderr $ "XML parse failed: " `append` (pack $ show err)
-      return id
+                  TIO.hPutStrLn stderr $ "XML parse failed: " `append` (pack $ show err)
+                  return M.empty
 
-compoundsMap :: Text -> XmlNode -> M.Map Text Compound
--- filter ((<= SPEC1) . prio . snd) $ 
-compoundsMap lang jmdic = M.fromListWith selectLowestPrio $ concatMap (toCompounds lang) $ filterDeepNodes ["entry"] jmdic
+loadVocList :: FilePath -> IO (M.Map Char [(Kreb, Int)])
+loadVocList vocListPath = do
+  rawVocLines <- fmap T.lines $ TIO.readFile vocListPath
+  let firstWord = T.takeWhile (/= ';')
+  let secondWord = T.tail . T.dropWhile (/= ';')
+  let vocList = fmap (\l -> (firstWord l, secondWord l)) rawVocLines
 
-selectLowestPrio c0@(Compound uid0 _ _ _ prio0) c1@(Compound uid1 _ _ _ prio1)
-  | prio0 < prio1 = c0
-  | prio0 > prio1 = c1
-  | uid1 < uid0 = c1
-  | otherwise = c0
+  let krebs = fmap (uncurry Kreb) vocList
 
-toCompounds :: Text -> XmlNode -> [(Text, Compound)]
-toCompounds lang entryNode = maybeToList $ toCompound lang entryNode
+  return $ M.fromListWith (++) [(kanji, [(kreb, i)]) | (kreb, i) <- zip krebs [0..],
+                                       kanji <- unpack $ keb kreb,
+                                       isCJK kanji]
 
-toCompound :: Text -> XmlNode -> Maybe (Text, Compound)
-toCompound lang entryNode
-  | keles == [] || translations == [] = Nothing
-  | otherwise = Just $ (keb, Compound uid keb reading (head translations) priority)
+krebAndPrio :: XmlNode -> XmlNode -> (Kreb, Priority)
+krebAndPrio kele rele = (Kreb k r, p)
   where
-    uid = read $ T.unpack $ unsafeText $ head $ filterDeepNodes ["ent_seq"] entryNode
-    keles = filterDeepNodes ["k_ele"] entryNode
-    kele = head keles
-    keb = unsafeText $ head $ filterDeepNodes ["keb"] kele 
-    readings = filterDeepNodes ["r_ele"] entryNode
-    reading = unsafeText $ head $ filterDeepNodes ["reb"] $ head $ sortOn re_pri readings
-    translations = catMaybes $ fmap (toSense lang) $ filterDeepNodes ["sense"] entryNode
-    priority = ke_pri kele
+    k = unsafeText $ head $ deepGetChildren ["keb"] kele
+    r = unsafeText $ head $ deepGetChildren ["reb"] rele
+    p = max (ke_pri kele) (re_pri rele)
+
+compound :: Text -> Kreb -> Priority -> XmlNode -> Compound
+compound lang (Kreb k r) p entry = Compound uid k r (head translations) p
+  where
+    uid = read $ T.unpack $ unsafeText $ head $ deepGetChildren ["ent_seq"] entry
+    translations = catMaybes $ fmap (toSense lang) $ deepGetChildren ["sense"] entry
+
+-- loadCompounds :: Bool -> Text -> FilePath -> FilePath -> IO (Kanji -> Kanji)
+-- loadCompounds noDictFilling lang vocListPath jmdicPath = do
+--   jmdicRaw <- L.readFile jmdicPath
+--   let (jmdic, mErr) = parse defaultParseOptions jmdicRaw :: (XmlNode, Maybe XMLParseError)
+--   let jmdicEntries = deepGetChildren ["entry"] jmdic
+
+--   rawVocLines <- fmap T.lines $ TIO.readFile vocListPath
+--   let firstWord = T.takeWhile (/= ';')
+--   let secondWord = T.tail . T.dropWhile (/= ';')
+--   let vocList = fmap (\l -> (firstWord l, secondWord l)) rawVocLines
+  
+--   let krebs = fmap (uncurry Kreb) vocList
+  
+--   let compoundsList = sortOn prio $ catMaybes $ fmap (loadCompound lang jmdicEntries) krebs
+
+--   let compounds kanji = take 6 $ filter (T.any (== char kanji) . kanjide) $ compoundsList
+--   let kanjiWithCompounds = \k -> k { compounds = compounds k }
+
+--   case mErr of
+--     Nothing -> return kanjiWithCompounds
+--     Just err -> do
+--       TIO.hPutStrLn stderr $ "XML parse failed: " `append` (pack $ show err)
+--       return id
+
+-- loadCompound :: Text -> [XmlNode] -> Kreb -> Maybe Compound
+-- loadCompound lang entries kreb@(Kreb keb reb) = listToMaybe $ fmap (toCompound lang kreb) entryNodes
+--   where
+--     entryNodes = filter (deepAssertions [(["k_ele","keb"], keb), (["r_ele","reb"], reb)]) entries
+
+-- toCompound :: Text -> Kreb -> XmlNode -> Compound
+-- toCompound lang (Kreb keb reb) entryNode = Compound uid keb reb (head translations) priority
+--   where
+--     uid = read $ T.unpack $ unsafeText $ head $ deepGetChildren ["ent_seq"] entryNode
+--     translations = catMaybes $ fmap (toSense lang) $ deepGetChildren ["sense"] entryNode
+--     keles = deepGetChildren ["k_ele"] entryNode
+--     kele = head $ filter (deepAssertions [(["keb"], keb)]) keles
+--     reles = deepGetChildren ["r_ele"] entryNode
+--     rele = head $ filter (deepAssertions [(["reb"], reb)]) reles
+--     priority = min (ke_pri kele) (re_pri rele)
 
 langFilter "fr" = attrFilter "xml:lang" "fre"
 langFilter _ = attrFilter "xml:lang" "eng"
@@ -72,16 +123,16 @@ toSense lang node
   | glosss == [] = Nothing
   | otherwise = Just $ fmap unsafeText glosss
   where
-    glosss = filter (langFilter lang) $ filterDeepNodes ["gloss"] node
+    glosss = filter (langFilter lang) $ deepGetChildren ["gloss"] node
 
 ke_pri :: XmlNode -> Priority
-ke_pri = priority "ke_pri"
+ke_pri = ele_pri "ke_pri"
 
 re_pri :: XmlNode -> Priority
-re_pri = priority "re_pri"
+re_pri = ele_pri "re_pri"
 
-priority :: Text -> XmlNode -> Priority
-priority text node = maybe Bottom id $ listToMaybe $ sort $ fmap (unwrap . readMaybe . T.unpack . toUpper . unsafeText) $ children text node
+ele_pri :: Text -> XmlNode -> Priority
+ele_pri text node = maybe Bottom id $ listToMaybe $ sort $ fmap (unwrap . readMaybe . T.unpack . toUpper . unsafeText) $ children text node
   where
     unwrap Nothing = Bottom
     unwrap (Just p) = p
