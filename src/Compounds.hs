@@ -6,7 +6,7 @@ module Compounds (loadCompound, loadJmDic, loadVocList, loadFreqList) where
 import qualified Data.Text.IO as TIO
 import qualified Data.Text as T
 import Data.Text (Text, pack, append, toUpper, unpack)
-import Data.List (sortOn, sort)
+import Data.List (sortOn, sort, groupBy, intersperse)
 import GHC.IO.Handle.FD (stderr)
 import qualified Data.ByteString.Lazy as L
 import Text.XML.Expat.Tree
@@ -18,14 +18,21 @@ import Text.Read (readMaybe)
 import Types
 import XmlHelper
 
-import Debug.Trace (traceShowId, traceShow)
-
-loadCompound :: M.Map Kreb Compound -> M.Map Char [(Kreb, Int)] -> M.Map Text Int -> Kanji -> Kanji
-loadCompound jmdic vocMap freqMap kanji = kanji { compounds = compounds }
+loadCompound :: M.Map Kreb Compound -> M.Map Char [Kreb] -> M.Map Text Int -> Kanji -> Kanji
+loadCompound jmdic vocMap freqMap kanji = kanji { compounds = take 6 $ refinedCompounds }
   where
     k = char kanji
-    krebs = fmap fst $ sortOn snd $ fmap (\(kreb, _) -> (kreb, M.findWithDefault 1000000 (keb kreb) freqMap)) $ M.findWithDefault [] k vocMap
-    compounds = take 6 $ catMaybes $ fmap (\kreb -> M.lookup kreb jmdic) krebs
+    limit = M.size freqMap
+    kebs = M.findWithDefault [] k vocMap
+    krebWithOrd kreb = (kreb, M.findWithDefault limit (keb kreb) freqMap)
+    krebs = fmap fst $ sortOn snd $ fmap krebWithOrd kebs
+    compounds = catMaybes $ fmap (`M.lookup` jmdic) krebs
+    refinedCompounds = fmap concatRebs $ groupBy (\x y -> kanjide x == kanjide y && translations x == translations y) compounds
+    concatRebs [] = error "groupBy failed us"
+    concatRebs [c] = c
+    concatRebs ((Compound u k r ts p):cs) = Compound u k rs ts p
+      where
+        rs = foldl T.append "" $ intersperse "/" $ r:(fmap reading cs)
 
 loadFreqList :: FilePath -> IO (M.Map Text Int)
 loadFreqList freqListPath = do
@@ -49,7 +56,7 @@ loadJmDic lang jmdicPath = do
                   TIO.hPutStrLn stderr $ "XML parse failed: " `append` (pack $ show err)
                   return M.empty
 
-loadVocList :: FilePath -> IO (M.Map Char [(Kreb, Int)])
+loadVocList :: FilePath -> IO (M.Map Char [Kreb])
 loadVocList vocListPath = do
   rawVocLines <- fmap T.lines $ TIO.readFile vocListPath
   let firstWord = T.takeWhile (/= ';')
@@ -58,7 +65,7 @@ loadVocList vocListPath = do
 
   let krebs = fmap (uncurry Kreb) vocList
 
-  return $ M.fromListWith (++) [(kanji, [(kreb, i)]) | (kreb, i) <- zip krebs [0..],
+  return $ M.fromListWith (++) [(kanji, [kreb]) | kreb <- krebs,
                                        kanji <- unpack $ keb kreb,
                                        isCJK kanji]
 
@@ -74,46 +81,6 @@ compound lang (Kreb k r) p entry = Compound uid k r (head translations) p
   where
     uid = read $ T.unpack $ unsafeText $ head $ deepGetChildren ["ent_seq"] entry
     translations = catMaybes $ fmap (toSense lang) $ deepGetChildren ["sense"] entry
-
--- loadCompounds :: Bool -> Text -> FilePath -> FilePath -> IO (Kanji -> Kanji)
--- loadCompounds noDictFilling lang vocListPath jmdicPath = do
---   jmdicRaw <- L.readFile jmdicPath
---   let (jmdic, mErr) = parse defaultParseOptions jmdicRaw :: (XmlNode, Maybe XMLParseError)
---   let jmdicEntries = deepGetChildren ["entry"] jmdic
-
---   rawVocLines <- fmap T.lines $ TIO.readFile vocListPath
---   let firstWord = T.takeWhile (/= ';')
---   let secondWord = T.tail . T.dropWhile (/= ';')
---   let vocList = fmap (\l -> (firstWord l, secondWord l)) rawVocLines
-  
---   let krebs = fmap (uncurry Kreb) vocList
-  
---   let compoundsList = sortOn prio $ catMaybes $ fmap (loadCompound lang jmdicEntries) krebs
-
---   let compounds kanji = take 6 $ filter (T.any (== char kanji) . kanjide) $ compoundsList
---   let kanjiWithCompounds = \k -> k { compounds = compounds k }
-
---   case mErr of
---     Nothing -> return kanjiWithCompounds
---     Just err -> do
---       TIO.hPutStrLn stderr $ "XML parse failed: " `append` (pack $ show err)
---       return id
-
--- loadCompound :: Text -> [XmlNode] -> Kreb -> Maybe Compound
--- loadCompound lang entries kreb@(Kreb keb reb) = listToMaybe $ fmap (toCompound lang kreb) entryNodes
---   where
---     entryNodes = filter (deepAssertions [(["k_ele","keb"], keb), (["r_ele","reb"], reb)]) entries
-
--- toCompound :: Text -> Kreb -> XmlNode -> Compound
--- toCompound lang (Kreb keb reb) entryNode = Compound uid keb reb (head translations) priority
---   where
---     uid = read $ T.unpack $ unsafeText $ head $ deepGetChildren ["ent_seq"] entryNode
---     translations = catMaybes $ fmap (toSense lang) $ deepGetChildren ["sense"] entryNode
---     keles = deepGetChildren ["k_ele"] entryNode
---     kele = head $ filter (deepAssertions [(["keb"], keb)]) keles
---     reles = deepGetChildren ["r_ele"] entryNode
---     rele = head $ filter (deepAssertions [(["reb"], reb)]) reles
---     priority = min (ke_pri kele) (re_pri rele)
 
 langFilter "fr" = attrFilter "xml:lang" "fre"
 langFilter _ = attrFilter "xml:lang" "eng"
