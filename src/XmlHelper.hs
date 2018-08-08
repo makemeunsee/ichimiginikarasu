@@ -1,4 +1,6 @@
-module XmlHelper (XmlNode, deepAssertions, children, deepGetChildren, unsafeText, attrFilter, noAttrFilter) where
+{-# LANGUAGE OverloadedStrings #-}
+
+module XmlHelper (XmlNode, deepAssertions, children, deepGetChildren, unsafeText, attrFilter, noAttrFilter, debugHead) where
 
 import Text.XML.Expat.Tree
 import Text.XML.Expat.Proc
@@ -18,7 +20,7 @@ deepGetChildren' (name : names) nodes = deepGetChildren' names $ concatMap (chil
 deepGetChildren' _ nodes = nodes
 
 unsafeText :: XmlNode -> Text
-unsafeText = getText . head . filter isText . getChildren 
+unsafeText n = (getText . debugHead (show n) . filter isText . getChildren) n
 
 noAttrFilter :: Text -> XmlNode -> Bool
 noAttrFilter attrName = all ((/= attrName) . fst) . getAttributes
@@ -39,3 +41,7 @@ deepAssertions ((address, value):rs) node = truth1 && truth2
 
 hasText :: Text -> XmlNode -> Bool
 hasText text = any (== text) . (fmap getText) . (filter isText) . getChildren
+
+debugHead :: String -> [a] -> a
+debugHead text [] = error text
+debugHead _ l = head l

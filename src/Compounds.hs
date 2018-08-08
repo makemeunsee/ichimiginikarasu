@@ -77,10 +77,10 @@ krebAndPrio kele rele = (Kreb k r, p)
     p = max (ke_pri kele) (re_pri rele)
 
 compound :: Text -> Kreb -> Priority -> XmlNode -> Compound
-compound lang (Kreb k r) p entry = Compound uid k r (head translations) p
+compound lang (Kreb k r) p entry = Compound uid k r translations p
   where
     uid = read $ T.unpack $ unsafeText $ head $ deepGetChildren ["ent_seq"] entry
-    translations = catMaybes $ fmap (toSense lang) $ deepGetChildren ["sense"] entry
+    translations = concat $ catMaybes $ fmap (toSense lang) $ deepGetChildren ["sense"] entry
 
 langFilter "fr" = attrFilter "xml:lang" "fre"
 langFilter _ = attrFilter "xml:lang" "eng"
