@@ -69,6 +69,7 @@ substitutions =
   , ("___SIMILAR_KANJIS___", similarSubst . similars)
   , ("___COMPOUNDS___", withFixesOr "\\hspace{1pt}" compoundsPrefix compoundsSuffix . makeCompounds compoundWithPrio)
   , ("___COMPOUND_TRANSLATIONS___", withFixesOr "\\vspace*{\\fill}" compoundsReadingPrefix compoundsReadingSuffix . makeCompounds readingAndTranslations)
+  , ("___ID___", pack . show . customOrd)
   ]
 
 compoundWithPrio c = t `append` "%" `append` (pack $ show $ prio c)

@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module XmlHelper (XmlNode, deepAssertions, children, deepGetChildren, unsafeText, attrFilter, noAttrFilter, debugHead) where
 
 import Text.XML.Expat.Tree
@@ -9,7 +7,7 @@ import Data.Text (Text)
 type XmlNode = NodeG [] Text Text
 
 children :: Text -> XmlNode -> [XmlNode]
-children name node = childFilter ((== name) . getName) node
+children name = childFilter ((== name) . getName)
 
 -- find all nested nodes matching the 'address' (tag hierarchy)
 deepGetChildren :: [Text] -> XmlNode -> [XmlNode]
@@ -26,7 +24,7 @@ noAttrFilter :: Text -> XmlNode -> Bool
 noAttrFilter attrName = all ((/= attrName) . fst) . getAttributes
 
 attrFilter :: Text -> Text -> XmlNode -> Bool
-attrFilter attrName attrValue = any (== (attrName, attrValue)) . getAttributes
+attrFilter attrName attrValue = elem (attrName, attrValue) . getAttributes
 
 childFilter :: (XmlNode -> Bool) -> XmlNode -> [XmlNode]
 childFilter childPredicate node = filter childPredicate $ getChildren node
@@ -40,7 +38,7 @@ deepAssertions ((address, value):rs) node = truth1 && truth2
     truth2 = deepAssertions rs node
 
 hasText :: Text -> XmlNode -> Bool
-hasText text = any (== text) . (fmap getText) . (filter isText) . getChildren
+hasText text = elem text . fmap getText . filter isText . getChildren
 
 debugHead :: String -> [a] -> a
 debugHead text [] = error text

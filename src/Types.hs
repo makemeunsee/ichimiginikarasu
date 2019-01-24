@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Types (Kanji(..), Radical(..), Compound(..), Priority(..), Kreb(..), isCJK) where
 
 import Data.Text (Text)
@@ -10,7 +8,7 @@ isCJK c = ord c >= 19968 && ord c <= 40879
 data Radical = Radical { r_number :: Int, r_char :: Char, r_strokes :: Int, r_meaning :: Text }
   deriving ( Show, Eq )
 
-data Kanji = Kanji { char :: Char, codepoint :: Text, radical :: Radical, strokes :: Int, onReadings :: [Text], kunReadings :: [Text], meanings :: [Text], similars :: [(Char, Text)], compounds :: [Compound] }
+data Kanji = Kanji { customOrd :: Int, char :: Char, codepoint :: Text, radical :: Radical, strokes :: Int, onReadings :: [Text], kunReadings :: [Text], meanings :: [Text], similars :: [(Char, Text)], compounds :: [Compound] }
   deriving ( Show, Eq )
 
 data Compound = Compound { uid :: Int, kanjide :: Text, reading :: Text, translations :: [Text], prio :: Priority }

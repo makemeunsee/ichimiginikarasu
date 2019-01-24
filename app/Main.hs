@@ -4,10 +4,11 @@ module Main where
 
 import Options.Applicative
 import Data.Semigroup ((<>))
-import Data.Set (toList, fromList)
+import qualified Data.Set as Set
 import Data.Text (Text, pack)
 import Data.Text.IO (hPutStrLn)
 import GHC.IO.Handle.FD (stdout)
+import Data.Maybe (listToMaybe)
 
 import Kanjidic
 import XmlHelper
@@ -20,7 +21,7 @@ import FlashcardsTex
 import Debug.Trace (traceShow, traceShowId)
 
 mkUniq :: Ord a => [a] -> [a]
-mkUniq = toList . fromList
+mkUniq = Set.toList . Set.fromList
 
 data Params = Params
   { debug :: Bool
@@ -98,19 +99,24 @@ radicalFilePath lang
   | lang == "fr" = "resources/radicals_haskelled_fr"
   | otherwise = "resources/radicals_haskelled"
 
+orderFrom :: [a] -> (a -> b) -> (b -> Maybe c) -> [c] -> [c]
+orderFrom refList refKey fromKey toOrder = foldr aToC [] refList
+  where
+    aToC el acc = maybe acc (: acc) (fromKey $ refKey el)
+
 generateFlashcards (Params debug input deck lang kanjidic jmdic vocList freqlist noDictFilling) = do
-  codepoints <- fmap (traceShow "read code points". mkUniq . filter isCJK) $ readFile input
-  rawKanjis <- fmap (traceShow "read kanjis") $ kanjis (pack lang) kanjidic
-  loadRadical <- fmap (traceShow "prepared radical func") $ loadRadicalData (radicalFilePath lang) "resources/kradfile-u_haskelled"
-  loadSimilar <- fmap (traceShow "prepared similarity func") $ loadSimilarKanjis rawKanjis "resources/jyouyou__strokeEditDistance.csv"
-  vocMap <- fmap (traceShow "prepared voc map") $ loadVocList vocList
-  jmdic <- fmap (traceShow "prepared compounds map") $ loadJmDic (pack lang) jmdic
-  freqMap <- fmap (traceShow "prepared freq map") $ loadFreqList freqlist
+  codepoints <- traceShow "read code points". filter isCJK <$> readFile input
+  rawKanjis <- traceShow "read kanjis" <$> kanjis (pack lang) kanjidic
+  loadRadical <- traceShow "prepared radical func" <$> loadRadicalData (radicalFilePath lang) "resources/kradfile-u_haskelled"
+  loadSimilar <- traceShow "prepared similarity func" <$> loadSimilarKanjis rawKanjis "resources/jyouyou__strokeEditDistance.csv"
+  vocMap <- traceShow "prepared voc map" <$> loadVocList vocList
+  jmdic <- traceShow "prepared compounds map" <$> loadJmDic (pack lang) jmdic
+  freqMap <- traceShow "prepared freq map" <$> loadFreqList freqlist
 
-  let kanjis = traceShow "loaded kanjis" $ fmap ((loadCompound jmdic vocMap freqMap) . loadSimilar . loadRadical) rawKanjis
+  let kanjis = traceShow "loaded kanjis" $ fmap (loadCompound jmdic vocMap freqMap . loadSimilar . loadRadical) rawKanjis
 
-  let relevants = traceShow "filtered relevant kanjis" $ filter (\k -> elem (char k) codepoints) kanjis
-  let count = traceShowId $ length relevants
+  let relevants = traceShow "filtered relevant kanjis" $ filter (\k -> elem (char k) $ mkUniq codepoints) kanjis
+  let reordered = traceShow "reordered" $ fmap (\(i, k) -> k { customOrd = i }) $ zip [0..] $ orderFrom codepoints id (\c -> listToMaybe $ filter ((== c) . char) relevants) relevants
 
-  texContent <- fmap (traceShow "generated tex content") $ generateTex debug (pack deck) relevants
+  texContent <- traceShow "generated tex content" <$> generateTex debug (pack deck) reordered
   hPutStrLn stdout texContent

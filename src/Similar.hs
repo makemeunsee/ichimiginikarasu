@@ -10,7 +10,7 @@ import Types
 
 loadSimilarKanjis :: [Kanji] -> FilePath -> IO (Kanji -> Kanji)
 loadSimilarKanjis kanjis path = do
- similars <- fmap (fmap (take 4) . fmap (filter isCJK) . lines) $ readFile path
+ similars <- fmap (take 4 . filter isCJK) . lines <$> readFile path
  return $ loadSimilars kanjis similars
 
 loadSimilars kanjis similars kanji = kanji { similars = sims }

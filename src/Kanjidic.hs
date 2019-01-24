@@ -23,7 +23,7 @@ kanjis lang path = do
   case mErr of
     Nothing -> return $ fmap (loadKanji lang) charNodes
     Just err -> do
-      TIO.hPutStrLn stderr $ "XML parse failed: " `append` (pack $ show err)
+      TIO.hPutStrLn stderr $ "XML parse failed: " `append` pack (show err)
       return []
 
 jlptKanjis :: Int -> FilePath -> IO [Char]
@@ -38,12 +38,12 @@ jlptKanjis level path = do
   case mErr of
     Nothing -> return $ fmap loadKanjiChar charNodes
     Just err -> do
-      TIO.hPutStrLn stderr $ "XML parse failed: " `append` (pack $ show err)
+      TIO.hPutStrLn stderr $ "XML parse failed: " `append` pack (show err)
       return []
 
 loadKanjiChar = T.head . unsafeText . head . deepGetChildren ["literal"]
 
-loadKanji lang charNode = Kanji { char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = [], compounds = [] }
+loadKanji lang charNode = Kanji { customOrd = 0, char = char, codepoint = codepoint, radical = placeHolderRadical radical, strokes = strokes, onReadings = onReadings, kunReadings = kunReadings, meanings = meanings, similars = [], compounds = [] }
   where
     isUCS = attrFilter "cp_type" "ucs"
     cpValues = deepGetChildren ["codepoint", "cp_value"] charNode
