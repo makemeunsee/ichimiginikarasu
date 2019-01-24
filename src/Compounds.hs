@@ -74,7 +74,7 @@ krebAndPrio kele rele = (Kreb k r, p)
   where
     k = unsafeText $ head $ deepGetChildren ["keb"] kele
     r = unsafeText $ head $ deepGetChildren ["reb"] rele
-    p = max (kePri kele) (rePri rele)
+    p = max (kanjiNodePriority kele) (readingNodePriority rele)
 
 compound :: Text -> Kreb -> Priority -> XmlNode -> Compound
 compound lang (Kreb k r) p entry = Compound uid k r translations p
@@ -92,14 +92,14 @@ toSense lang node
   where
     glosss = filter (langFilter lang) $ deepGetChildren ["gloss"] node
 
-kePri :: XmlNode -> Priority
-kePri = elePri "kePri"
+kanjiNodePriority :: XmlNode -> Priority
+kanjiNodePriority = nodePriority "ke_pri"
 
-rePri :: XmlNode -> Priority
-rePri = elePri "rePri"
+readingNodePriority :: XmlNode -> Priority
+readingNodePriority = nodePriority "re_pri"
 
-elePri :: Text -> XmlNode -> Priority
-elePri text node = fromMaybe Bottom $ listToMaybe $ sort $ unwrap . readMaybe . T.unpack . toUpper . unsafeText <$> children text node
+nodePriority :: Text -> XmlNode -> Priority
+nodePriority text node = fromMaybe Bottom $ listToMaybe $ sort $ unwrap . readMaybe . T.unpack . toUpper . unsafeText <$> children text node
   where
     unwrap Nothing = Bottom
     unwrap (Just p) = p
